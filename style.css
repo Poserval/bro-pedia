@@ -22,12 +22,19 @@ body {
 }
 
 .logo {
-    font-size: 48px;
-    font-weight: 600;
+    font-size: 64px;
+    font-weight: 900;
     text-align: center;
     color: #1a73e8;
     margin-bottom: 12px;
-    letter-spacing: -0.5px;
+    letter-spacing: 2px;
+    font-family: 'Courier New', 'Press Start 2P', monospace;
+    text-shadow: 
+        4px 4px 0 #0d3c6e,
+        6px 6px 0 rgba(0,0,0,0.2);
+    transform: scaleY(0.98);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 .subtitle {

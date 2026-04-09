@@ -244,3 +244,44 @@ app.use(express.static('.'));
 app.listen(PORT, () => {
     console.log(`🔥 Bro-педия 2.0 на порту ${PORT}`);
 });
+
+// === ALTERNATIVНЫЙ ИСТОЧНИК: WIKIMEDIA ENTERPRISE API ===
+async function searchEnterpriseAPI(query) {
+    const enterpriseKey = process.env.WIKI_ENTERPRISE_KEY;
+    if (!enterpriseKey) {
+        console.log('Enterprise API ключ отсутствует');
+        return null;
+    }
+    
+    try {
+        // Поиск статьи через Enterprise API
+        const url = `https://enterprise.wikimedia.com/api/v1/on-demand?title=${encodeURIComponent(query)}&format=json`;
+        
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${enterpriseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.log(`Enterprise API error: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.extract) {
+            return {
+                found: true,
+                title: data.title || query,
+                extract: data.extract,
+                fullText: data.html || data.extract
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Enterprise API fetch error:', error.message);
+        return null;
+    }
+}

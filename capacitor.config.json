@@ -1,0 +1,11 @@
+{
+  "appId": "com.bropedia.app",
+  "appName": "Bro-педия",
+  "webDir": "capacitor-web",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

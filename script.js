@@ -2,6 +2,7 @@ const questionInput = document.getElementById('questionInput');
 const askButton = document.getElementById('askButton');
 const answerContainer = document.getElementById('answerContainer');
 
+// Определяем адрес бэкенда
 const BACKEND_URL = 'https://bro-pedia.onrender.com';
 
 let currentQuestion = '';
@@ -25,37 +26,24 @@ function showLoading() {
             <div class="loading-spinner"></div>
             <div class="loading-text">${steps[0]}</div>
             <div class="loading-timer">0 сек</div>
-            <div class="loading-steps">
-                ${steps.map((step, i) => `<div class="loading-step" data-step="${i}">${step}</div>`).join('')}
-            </div>
         </div>
     `;
     
-    // Анимация смены шагов
     loadingInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const timerEl = document.querySelector('.loading-timer');
         if (timerEl) timerEl.textContent = `${elapsed} сек`;
         
-        // Меняем шаги каждые 3 секунды
         if (elapsed > 3 && stepIndex < steps.length - 1) {
             stepIndex++;
             const stepText = document.querySelector('.loading-text');
             if (stepText) stepText.textContent = steps[stepIndex];
-            
-            // Подсвечиваем активный шаг
-            document.querySelectorAll('.loading-step').forEach((el, idx) => {
-                if (idx === stepIndex) {
-                    el.classList.add('active');
-                }
-            });
         }
         
-        // Если прошло больше 15 секунд — меняем текст на более бодрый
         if (elapsed > 15) {
             const stepText = document.querySelector('.loading-text');
             if (stepText && !stepText.textContent.includes('не сплю')) {
-                stepText.textContent = '🥱 Википедия тупит, но я не сплю...';
+                stepText.textContent = '🥱 Сеть тупит, но я не сплю...';
             }
         }
         if (elapsed > 25) {
@@ -99,7 +87,7 @@ async function askQuestion() {
         answerContainer.innerHTML = `
             <div class="loading-container">
                 <div style="color: #d32f2f; margin-bottom: 10px;">⚠️ Что-то пошло не так, братан</div>
-                <div style="color: #5f6368;">Сервер ещё не проснулся. Попробуй через минуту или спроси что-то другое.</div>
+                <div style="color: #5f6368;">Сервер ещё не проснулся. Попробуй через минуту.</div>
                 <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #1a73e8; color: white; border: none; border-radius: 20px; cursor: pointer;">🔄 Обновить</button>
             </div>
         `;
@@ -163,7 +151,7 @@ function displayAnswer(answerHtml, showFullButton) {
         });
     });
     
-    // Обработка предложений (если Википедия не нашла)
+    // Обработка предложений
     document.querySelectorAll('.suggestion').forEach(el => {
         el.addEventListener('click', () => {
             const suggestion = el.getAttribute('data-name');
@@ -173,7 +161,7 @@ function displayAnswer(answerHtml, showFullButton) {
         });
     });
     
-    // Добавляем кнопку "Подробнее", если это краткий ответ и есть полная версия
+    // Кнопка "Подробнее"
     if (showFullButton && currentTitle) {
         const button = document.createElement('button');
         button.textContent = '📖 Подробнее';

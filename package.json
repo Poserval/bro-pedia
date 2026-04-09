@@ -4,12 +4,14 @@
   "scripts": {
     "build": "mkdir -p capacitor-web && cp *.html *.json *.js *.css capacitor-web/ && cp -r icons capacitor-web/",
     "clean": "rm -rf capacitor-web android",
-    "cap:clean": "rm -rf android && npm run build && npx cap add android"
+    "cap:clean": "rm -rf android && npm run build && npx cap add android",
+    "generate-assets": "npx capacitor-assets generate"
   },
   "dependencies": {
     "@capacitor/android": "^5.0.0",
     "@capacitor/cli": "^5.0.0",
-    "@capacitor/core": "^5.0.0"
+    "@capacitor/core": "^5.0.0",
+    "@capacitor/assets": "^3.0.0"
   },
   "devDependencies": {
     "@capacitor/app": "^5.0.8",

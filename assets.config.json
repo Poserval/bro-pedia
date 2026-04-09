@@ -1,0 +1,10 @@
+{
+  "resources": {
+    "android": {
+      "icon": {
+        "foreground": "icons/icon-xxhdpi.png",
+        "background": "icons/icon-xxhdpi.png"
+      }
+    }
+  }
+}

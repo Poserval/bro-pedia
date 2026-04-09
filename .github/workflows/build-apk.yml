@@ -45,7 +45,6 @@ jobs:
         if [ -d "icons" ]; then
           echo "🔄 Копируем иконки в Android-проект..."
           
-          # Копируем иконки для разных плотностей (если они есть)
           [ -f "icons/icon-mdpi.png" ] && cp icons/icon-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
           [ -f "icons/icon-mdpi.png" ] && cp icons/icon-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
           
@@ -61,12 +60,9 @@ jobs:
           [ -f "icons/icon-xxxhdpi.png" ] && cp icons/icon-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
           [ -f "icons/icon-xxxhdpi.png" ] && cp icons/icon-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
           
-          # Play Store иконка (512x512)
-          [ -f "icons/icon-playstore.png" ] && cp icons/icon-playstore.png android/app/src/main/res/raw/play_store_icon.png
-          
-          echo "✅ Иконки установлены в Android-проект"
+          echo "✅ Иконки лаунчера установлены"
         else
-          echo "⚠️ Папка icons не найдена, иконки не скопированы"
+          echo "⚠️ Папка icons не найдена"
         fi
         
     - name: Setup Java

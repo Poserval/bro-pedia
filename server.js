@@ -312,6 +312,211 @@ app.post('/api/ask/suggestion', async (req, res) => {
 // === РАЗДАЧА СТАТИКИ ===
 app.use(express.static('.'));
 
+// === КОНТРОЛЬ БАЛАНСА DEEPSEEK ===
+async function getDeepSeekBalance() {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) return { error: 'API ключ не найден' };
+    
+    try {
+        const response = await fetch('https://api.deepseek.com/user/balance', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        
+        if (!response.ok) {
+            return { error: `Ошибка: ${response.status}` };
+        }
+        
+        const data = await response.json();
+        
+        // Баланс в CNY
+        const balanceCNY = parseFloat(data.balance_infos?.[0]?.total_balance || 0);
+        const grantedCNY = parseFloat(data.balance_infos?.[0]?.granted_balance || 0);
+        const toppedUpCNY = parseFloat(data.balance_infos?.[0]?.topped_up_balance || 0);
+        
+        // Конвертируем в USD и рубли (примерно)
+        const usdRate = 0.14; // 1 CNY ≈ 0.14 USD
+        const rubRate = 12.5;  // 1 CNY ≈ 12.5 RUB
+        
+        return {
+            success: true,
+            cny: balanceCNY,
+            usd: Math.round(balanceCNY * usdRate * 100) / 100,
+            rub: Math.round(balanceCNY * rubRate),
+            granted_cny: grantedCNY,
+            topped_up_cny: toppedUpCNY,
+            is_low: balanceCNY < 15 // меньше 15 юаней (~$2) — пора пополнять
+        };
+    } catch (error) {
+        console.error('Balance check error:', error.message);
+        return { error: error.message };
+    }
+}
+
+// === АДМИН-СТРАНИЦА ДЛЯ ПРОВЕРКИ БАЛАНСА ===
+// Секретный адрес: /admin/balance_XXX (XXX заменишь на свой код)
+// Чтобы никто случайно не зашёл
+const ADMIN_SECRET = '46852'; // Секретный код
+
+app.get(`/admin/balance/${ADMIN_SECRET}`, async (req, res) => {
+    const balance = await getDeepSeekBalance();
+    
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bro-педия | Админ-панель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #161b22;
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #30363d;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #1a73e8;
+            font-family: 'Press Start 2P', monospace;
+            text-align: center;
+        }
+        .balance-card {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #30363d;
+        }
+        .balance-amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        .balance-currency {
+            font-size: 20px;
+            color: #8b949e;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #21262d;
+        }
+        .label { color: #8b949e; }
+        .value { font-weight: bold; }
+        .warning {
+            background: #3b2e1e;
+            border: 1px solid #f0883e;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .success {
+            background: #1a3a2a;
+            border: 1px solid #3fb950;
+        }
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover { background: #1557b0; }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+        .refresh-time {
+            text-align: center;
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Bro-педия<br><span style="font-size: 14px;">Админ-панель</span></h1>
+        
+        ${balance.error ? `
+            <div class="warning">
+                ❌ Ошибка: ${balance.error}
+            </div>
+        ` : `
+            <div class="balance-card">
+                <div class="balance-amount">${balance.cny.toFixed(2)} <span class="balance-currency">CNY</span></div>
+                <div style="margin-top: 5px;">≈ $${balance.usd} / ${balance.rub} ₽</div>
+            </div>
+            
+            <div class="row">
+                <span class="label">💰 Выданный баланс</span>
+                <span class="value">${balance.granted_cny.toFixed(2)} CNY</span>
+            </div>
+            <div class="row">
+                <span class="label">💳 Пополненный баланс</span>
+                <span class="value">${balance.topped_up_cny.toFixed(2)} CNY</span>
+            </div>
+            <div class="row">
+                <span class="label">📅 Последняя проверка</span>
+                <span class="value">${new Date().toLocaleString('ru-RU')}</span>
+            </div>
+            
+            ${balance.is_low ? `
+                <div class="warning">
+                    ⚠️ ВНИМАНИЕ! Баланс ниже 1 CNY (~$0.15).<br>
+                    <strong>Пора пополнить счёт в DeepSeek!</strong>
+                </div>
+            ` : `
+                <div class="warning success">
+                    ✅ Баланс в норме. Меньше 1 CNY — тогда пополняй.
+                </div>
+            `}
+        `}
+        
+        <button onclick="location.reload()">🔄 Обновить баланс</button>
+        <div class="refresh-time">Секретный адрес — храни в тайне</div>
+        <div class="footer">
+            <a href="https://platform.deepseek.com/top_up" target="_blank" style="color: #58a6ff;">➡️ Пополнить DeepSeek</a>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+    
+    res.send(html);
+});
+
+// === (ОПЦИОНАЛЬНО) API-ЭНДПОИНТ ДЛЯ ПРОВЕРКИ БАЛАНСА (JSON) ===
+app.get('/api/balance', async (req, res) => {
+    const balance = await getDeepSeekBalance();
+    res.json(balance);
+});
+
+console.log(`🔐 Админ-панель: https://bro-pedia.onrender.com/admin/balance/${ADMIN_SECRET}`);
+
 // === ЗАПУСК ===
 app.listen(PORT, () => {
     console.log(`🔥 Bro-педия 2.0 на порту ${PORT}`);

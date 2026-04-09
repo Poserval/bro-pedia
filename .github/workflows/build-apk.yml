@@ -1,0 +1,55 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Clean previous build
+      run: rm -rf capacitor-web android
+      
+    - name: Install dependencies
+      run: npm install --package-lock=false
+      
+    - name: Build web assets
+      run: |
+        mkdir -p capacitor-web
+        cp index.html style.css script.js capacitor-web/
+        cp -r icons capacitor-web/ 2>/dev/null || true
+        
+    - name: Generate Android project
+      run: |
+        npx cap add android || true
+        npx cap sync android
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Build Debug APK (unsigned)
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug --no-daemon
+        
+    - name: Upload Debug APK to Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: bro-pedia-debug-apk
+        path: android/app/build/outputs/apk/debug/*.apk
+        retention-days: 30

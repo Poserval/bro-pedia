@@ -9,7 +9,7 @@ app.use(express.json());
 // Кэш для кратких и полных ответов
 const cache = new Map();
 
-// === ФУНКЦИЯ ОБРАБОТКИ РАСПЛЫВЧАТЫХ ЧИСЕЛ ===
+// === ОБРАБОТКА РАСПЛЫВЧАТЫХ ЧИСЕЛ ===
 function replaceVagueNumbers(text) {
     const rules = [
         { from: /\b(очень много|много|куча|уйма)\b/gi, to: 'чуть меньше чем до хрена' },
@@ -26,15 +26,13 @@ function replaceVagueNumbers(text) {
     return result;
 }
 
-// === ПОИСК В ВИКИПЕДИИ С ПРЕДЛОЖЕНИЕМ ВАРИАНТОВ ===
+// === ОСНОВНОЙ ИСТОЧНИК (обычная Википедия) ===
 async function searchWikipedia(query) {
     try {
-        // Прямой поиск статьи
         const url = `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
         const response = await fetch(url);
         
         if (response.status === 404) {
-            // Поиск похожих
             const searchUrl = `https://ru.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
             const searchRes = await fetch(searchUrl);
             const searchData = await searchRes.json();
@@ -48,29 +46,103 @@ async function searchWikipedia(query) {
         
         if (!response.ok) return { found: false, suggestions: [] };
         const data = await response.json();
-        return { found: true, data };
+        return { found: true, data, source: 'wiki' };
     } catch (e) {
-        console.error('Wikipedia error:', e.message);
-        return { found: false, suggestions: [] };
+        console.error('Primary source error:', e.message);
+        return { found: false, suggestions: [], error: true };
     }
 }
 
-// === ПОЛУЧЕНИЕ ПОЛНОЙ СТАТЬИ (без примечаний, ссылок, литературы) ===
+// === РЕЗЕРВНЫЙ ИСТОЧНИК (Wikimedia Enterprise API) ===
+async function searchEnterpriseAPI(query) {
+    const enterpriseKey = process.env.WIKI_ENTERPRISE_KEY;
+    if (!enterpriseKey) {
+        console.log('Enterprise API key not set');
+        return null;
+    }
+    
+    try {
+        const url = `https://enterprise.wikimedia.com/api/v1/on-demand?title=${encodeURIComponent(query)}&format=json`;
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${enterpriseKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            console.log(`Enterprise API error: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.extract) {
+            return {
+                found: true,
+                data: {
+                    title: data.title || query,
+                    extract: data.extract,
+                    fullText: data.html || data.extract
+                },
+                source: 'enterprise'
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Enterprise API fetch error:', error.message);
+        return null;
+    }
+}
+
+// === УМНЫЙ ПОИСК С ЦЕПОЧКОЙ ИСТОЧНИКОВ ===
+async function getArticleInfo(question) {
+    // 1. Пробуем основной источник
+    const wikiResult = await searchWikipedia(question);
+    if (wikiResult.found) return wikiResult;
+    if (wikiResult.error) {
+        console.log('Primary source failed, trying backup...');
+    }
+    
+    // 2. Пробуем резервный источник (Enterprise API)
+    const enterpriseResult = await searchEnterpriseAPI(question);
+    if (enterpriseResult && enterpriseResult.found) {
+        return { found: true, data: enterpriseResult.data, source: 'enterprise' };
+    }
+    
+    // 3. Если есть предложения от основного источника — возвращаем их
+    if (wikiResult.suggestions && wikiResult.suggestions.length > 0) {
+        return { found: false, suggestions: wikiResult.suggestions };
+    }
+    
+    // 4. Совсем ничего не нашли
+    return { found: false, suggestions: [] };
+}
+
+// === ПОЛУЧЕНИЕ ПОЛНОЙ СТАТЬИ ===
 async function getFullArticle(title) {
+    // Сначала пробуем Enterprise API
+    const enterpriseResult = await searchEnterpriseAPI(title);
+    if (enterpriseResult && enterpriseResult.found && enterpriseResult.data.fullText) {
+        let cleanText = enterpriseResult.data.fullText
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/\[\d+\]/g, '')
+            .trim();
+        return cleanText.length > 5000 ? cleanText.substring(0, 5000) + '...' : cleanText;
+    }
+    
+    // Если не получилось — пробуем обычную Википедию
     try {
         const url = `https://ru.wikipedia.org/api/rest_v1/page/html/${encodeURIComponent(title)}`;
         const response = await fetch(url);
         if (!response.ok) return null;
         
         const html = await response.text();
-        
-        // Грубая очистка от мусора
         let cleanText = html
             .replace(/<style[^>]*>.*?<\/style>/gis, '')
             .replace(/<script[^>]*>.*?<\/script>/gis, '')
             .replace(/<ref[^>]*>.*?<\/ref>/gis, '')
-            .replace(/<li[^>]*class="mw-gallery[^>]*>.*?<\/li>/gis, '')
-            .replace(/<table[^>]*class="infobox[^>]*>.*?<\/table>/gis, '') // карточка отдельно
             .replace(/<a[^>]*href="\/wiki\/[^:"]*"[^>]*>/g, '')
             .replace(/<\/a>/g, '')
             .replace(/<[^>]+>/g, ' ')
@@ -79,7 +151,6 @@ async function getFullArticle(title) {
             .replace(/Примечания|Ссылки|Литература|Источники[^.]*\./gi, '')
             .trim();
         
-        // Ограничиваем длину (около 5000 символов для полного ответа)
         return cleanText.length > 5000 ? cleanText.substring(0, 5000) + '...' : cleanText;
     } catch (e) {
         console.error('Full article error:', e.message);
@@ -87,7 +158,7 @@ async function getFullArticle(title) {
     }
 }
 
-// === ОБЩАЯ ФУНКЦИЯ ДЛЯ ЗАПРОСА К DEEPSEEK ===
+// === ЗАПРОС К DEEPSEEK (без упоминаний источников) ===
 async function askDeepSeek(question, context, mode = 'short') {
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
@@ -98,7 +169,8 @@ async function askDeepSeek(question, context, mode = 'short') {
 Твоя задача: пересказать информацию максимально коротко, 3-5 предложений, в пацанском стиле.
 Правила:
 - Никаких оскорблений и мата. Сленг можно: кекс, краш, хайп, имба, крипово, рофл.
-- Никогда не упоминай Википедию, DeepSeek, API, источники. Ты просто "шаришь".
+- НИКОГДА не упоминай никакие источники информации. Не говори "согласно данным", "как сказано в источниках", "по информации из сети". Просто пересказывай как есть.
+- Если пользователь спросит откуда ты знаешь — отвечай "Я просто шарою, бро, по жизни".
 - Важные имена оберни в HTML: <span class="mention" data-name="Имя">Имя</span>
 - Если есть точные цифры — оставляй их. Если расплывчатое "много" или "мало" — заменяй на "чуть меньше чем до хрена" и т.д.
 - Обращайся к пользователю как "братан", "кекс", "бро".
@@ -108,7 +180,7 @@ async function askDeepSeek(question, context, mode = 'short') {
 Твоя задача: пересказать информацию ПОЛНОСТЬЮ, но в пацанском стиле. 10-15 предложений.
 Правила:
 - Никаких оскорблений и мата. Сленг можно: кекс, краш, хайп, имба.
-- Никогда не упоминай Википедию, DeepSeek, API, источники.
+- НИКОГДА не упоминай никакие источники информации. Не говори "согласно данным", "как сказано в источниках", "по информации из сети". Просто пересказывай как есть.
 - Важные имена оберни в HTML: <span class="mention" data-name="Имя">Имя</span>
 - Если есть точные цифры — оставляй. Если расплывчатое "много" — заменяй на "чуть меньше чем до хрена".
 - Убирай примечания, ссылки, литературу. Оставляй только факты и сюжет.
@@ -140,7 +212,6 @@ async function askDeepSeek(question, context, mode = 'short') {
         
         const data = await response.json();
         let answer = data.choices[0].message.content;
-        // Дополнительная обработка чисел на всякий случай
         answer = replaceVagueNumbers(answer);
         return answer;
     } catch (error) {
@@ -177,13 +248,13 @@ app.post('/api/ask', async (req, res) => {
         return res.json({ answer: cache.get(cacheKey) });
     }
     
-    const wikiResult = await searchWikipedia(question);
+    const articleInfo = await getArticleInfo(question);
     
-    if (!wikiResult.found) {
-        if (wikiResult.suggestions && wikiResult.suggestions.length > 0) {
+    if (!articleInfo.found) {
+        if (articleInfo.suggestions && articleInfo.suggestions.length > 0) {
             const suggestionsHtml = `<p>Слушай, бро. Про <strong>${question}</strong> я точняк не нашёл.</p>
                                       <p>Может, ты имел в виду:</p>
-                                      <ul>${wikiResult.suggestions.map(s => `<li><span class="suggestion" data-name="${s}">${s}</span></li>`).join('')}</ul>
+                                      <ul>${articleInfo.suggestions.map(s => `<li><span class="suggestion" data-name="${s}">${s}</span></li>`).join('')}</ul>
                                       <p>Ткни на вариант — и я расскажу!</p>`;
             return res.json({ answer: suggestionsHtml });
         } else {
@@ -193,9 +264,8 @@ app.post('/api/ask', async (req, res) => {
         }
     }
     
-    const wikiData = wikiResult.data;
+    const wikiData = articleInfo.data;
     let fullText = wikiData.extract || '';
-    // Обработка чисел в сыром тексте перед отправкой в DeepSeek
     fullText = replaceVagueNumbers(fullText);
     
     const answer = await askDeepSeek(question, fullText, 'short');
@@ -206,7 +276,7 @@ app.post('/api/ask', async (req, res) => {
 // === ОБРАБОТЧИК ПОЛНОГО ОТВЕТА ===
 app.post('/api/ask/full', async (req, res) => {
     const { question, title } = req.body;
-    console.log(`[${new Date().toISOString()}] Полный ответ: ${question}`);
+    console.log(`[${new Date().toISOString()}] Полный: ${question}`);
     
     const cacheKey = `full_${question}`;
     if (cache.has(cacheKey)) {
@@ -216,9 +286,8 @@ app.post('/api/ask/full', async (req, res) => {
     
     let fullArticle = await getFullArticle(title);
     if (!fullArticle) {
-        // Fallback: используем краткое описание из summary
-        const wikiResult = await searchWikipedia(question);
-        fullArticle = wikiResult.found ? wikiResult.data.extract : 'Информация временно недоступна.';
+        const articleInfo = await getArticleInfo(question);
+        fullArticle = articleInfo.found ? articleInfo.data.extract : 'Информация временно недоступна, братан. Попробуй позже.';
     }
     
     fullArticle = replaceVagueNumbers(fullArticle);
@@ -227,61 +296,23 @@ app.post('/api/ask/full', async (req, res) => {
     res.json({ answer });
 });
 
-// === ОБРАБОТЧИК ДЛЯ ВАРИАНТОВ ИЗ ПРЕДЛОЖЕНИЙ ===
+// === ОБРАБОТЧИК ДЛЯ ПРЕДЛОЖЕНИЙ ===
 app.post('/api/ask/suggestion', async (req, res) => {
     const { suggestion } = req.body;
-    // Просто перенаправляем на обычный запрос с выбранным вариантом
-    const wikiResult = await searchWikipedia(suggestion);
-    if (wikiResult.found) {
-        const answer = await askDeepSeek(suggestion, wikiResult.data.extract, 'short');
-        res.json({ answer, title: wikiResult.data.title });
+    const articleInfo = await getArticleInfo(suggestion);
+    
+    if (articleInfo.found) {
+        const answer = await askDeepSeek(suggestion, articleInfo.data.extract, 'short');
+        res.json({ answer, title: articleInfo.data.title });
     } else {
         res.json({ answer: `<p>Бро, с <strong>${suggestion}</strong> тоже ничего не вышло. Попробуй что-то ещё.</p>` });
     }
 });
 
+// === РАЗДАЧА СТАТИКИ ===
 app.use(express.static('.'));
+
+// === ЗАПУСК ===
 app.listen(PORT, () => {
     console.log(`🔥 Bro-педия 2.0 на порту ${PORT}`);
 });
-
-// === ALTERNATIVНЫЙ ИСТОЧНИК: WIKIMEDIA ENTERPRISE API ===
-async function searchEnterpriseAPI(query) {
-    const enterpriseKey = process.env.WIKI_ENTERPRISE_KEY;
-    if (!enterpriseKey) {
-        console.log('Enterprise API ключ отсутствует');
-        return null;
-    }
-    
-    try {
-        // Поиск статьи через Enterprise API
-        const url = `https://enterprise.wikimedia.com/api/v1/on-demand?title=${encodeURIComponent(query)}&format=json`;
-        
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${enterpriseKey}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            console.log(`Enterprise API error: ${response.status}`);
-            return null;
-        }
-        
-        const data = await response.json();
-        
-        if (data && data.extract) {
-            return {
-                found: true,
-                title: data.title || query,
-                extract: data.extract,
-                fullText: data.html || data.extract
-            };
-        }
-        return null;
-    } catch (error) {
-        console.error('Enterprise API fetch error:', error.message);
-        return null;
-    }
-}

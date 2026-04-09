@@ -28,19 +28,19 @@ jobs:
       run: |
         mkdir -p capacitor-web
         cp index.html style.css script.js capacitor-web/
-        if [ -d "icons" ]; then
-          cp -r icons capacitor-web/
-        fi
-        
-    - name: Generate Android icons (capacitor-assets)
-      run: |
-        npx capacitor-assets generate --android
+        cp -r icons capacitor-web/
         
     - name: Generate Android project
+      run: npx cap add android && npx cap sync android
+      
+    - name: Replace launcher icons
       run: |
-        npx cap add android || true
-        npx cap sync android
-        
+        echo "🔄 Заменяем иконки..."
+        find android -name "ic_launcher*.png" -type f | while read file; do
+          cp ./icons/icon-app-162.png "$file" 2>/dev/null || true
+        done
+        echo "✅ Иконки заменены!"
+      
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
@@ -53,9 +53,9 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug --no-daemon
         
-    - name: Upload Debug APK to Artifacts
+    - name: Upload APK to Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: bro-pedia-debug-apk
+        name: bro-pedia-apk
         path: android/app/build/outputs/apk/debug/*.apk
         retention-days: 30

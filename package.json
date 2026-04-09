@@ -1,14 +1,18 @@
 {
   "name": "bro-pedia",
   "version": "1.0.0",
-  "description": "Википедия по понятиям",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "build": "mkdir -p capacitor-web && cp *.html *.json *.js *.css capacitor-web/ && cp -r icons capacitor-web/",
+    "clean": "rm -rf capacitor-web android",
+    "cap:clean": "rm -rf android && npm run build && npx cap add android"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "openai": "^4.80.0"
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/app": "^5.0.8",
+    "@capacitor/splash-screen": "^5.0.8"
   }
 }

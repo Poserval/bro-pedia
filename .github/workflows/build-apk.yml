@@ -28,12 +28,46 @@ jobs:
       run: |
         mkdir -p capacitor-web
         cp index.html style.css script.js capacitor-web/
-        cp -r icons capacitor-web/ 2>/dev/null || true
+        if [ -d "icons" ]; then
+          cp -r icons capacitor-web/
+          echo "✅ Иконки скопированы в capacitor-web/icons/"
+        else
+          echo "⚠️ Папка icons не найдена, пропускаем"
+        fi
         
     - name: Generate Android project
       run: |
         npx cap add android || true
         npx cap sync android
+        
+    - name: Copy launcher icons to Android
+      run: |
+        if [ -d "icons" ]; then
+          echo "🔄 Копируем иконки в Android-проект..."
+          
+          # Копируем иконки для разных плотностей (если они есть)
+          [ -f "icons/icon-mdpi.png" ] && cp icons/icon-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          [ -f "icons/icon-mdpi.png" ] && cp icons/icon-mdpi.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+          
+          [ -f "icons/icon-hdpi.png" ] && cp icons/icon-hdpi.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          [ -f "icons/icon-hdpi.png" ] && cp icons/icon-hdpi.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+          
+          [ -f "icons/icon-xhdpi.png" ] && cp icons/icon-xhdpi.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          [ -f "icons/icon-xhdpi.png" ] && cp icons/icon-xhdpi.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+          
+          [ -f "icons/icon-xxhdpi.png" ] && cp icons/icon-xxhdpi.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          [ -f "icons/icon-xxhdpi.png" ] && cp icons/icon-xxhdpi.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+          
+          [ -f "icons/icon-xxxhdpi.png" ] && cp icons/icon-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          [ -f "icons/icon-xxxhdpi.png" ] && cp icons/icon-xxxhdpi.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+          
+          # Play Store иконка (512x512)
+          [ -f "icons/icon-playstore.png" ] && cp icons/icon-playstore.png android/app/src/main/res/raw/play_store_icon.png
+          
+          echo "✅ Иконки установлены в Android-проект"
+        else
+          echo "⚠️ Папка icons не найдена, иконки не скопированы"
+        fi
         
     - name: Setup Java
       uses: actions/setup-java@v4
@@ -41,7 +75,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
-    - name: Build Debug APK (unsigned)
+    - name: Build Debug APK
       run: |
         cd android
         chmod +x gradlew

@@ -15,6 +15,108 @@ questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') askQuestion();
 });
 
+// === АДМИН-КНОПКА (только для тебя, через секретный URL) ===
+const ADMIN_SECRET_KEY = 'bropedia2025'; // Секретный ключ — замени на свой
+
+// Проверяем URL-параметр
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('admin') === ADMIN_SECRET_KEY) {
+    localStorage.setItem('admin_mode', 'true');
+    // Убираем параметр из URL, чтобы не светить
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+// Показываем кнопку, если режим админа включён
+if (localStorage.getItem('admin_mode') === 'true') {
+    const adminBtn = document.getElementById('adminButton');
+    if (adminBtn) adminBtn.style.display = 'flex';
+}
+
+// Функция для ручного включения (через консоль)
+window.enableAdminMode = () => {
+    localStorage.setItem('admin_mode', 'true');
+    document.getElementById('adminButton').style.display = 'flex';
+    alert('Режим админа включен! Жми на 🔧');
+};
+
+// Функция выхода из админки
+window.logoutAdmin = () => {
+    localStorage.removeItem('admin_mode');
+    document.getElementById('adminButton').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    alert('Вы вышли из админки');
+};
+
+// Открыть админ-панель
+document.getElementById('adminButton')?.addEventListener('click', async () => {
+    const panel = document.getElementById('adminPanel');
+    if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+        return;
+    }
+    
+    panel.style.display = 'block';
+    document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка...</div>';
+    
+    try {
+        // Запрашиваем баланс и статистику кэша
+        const [balanceRes, cacheRes] = await Promise.all([
+            fetch(`${BACKEND_URL}/api/balance`),
+            fetch(`${BACKEND_URL}/admin/cache/bropedia2025`)
+        ]);
+        
+        const balance = await balanceRes.json();
+        const cacheStats = await cacheRes.json();
+        
+        const balanceCNY = balance.cny || 0;
+        const isLow = balanceCNY < 1;
+        
+        let html = `
+            <div style="margin-bottom: 16px; padding: 12px; background: ${isLow ? '#ffebee' : '#e8f0fe'}; border-radius: 12px;">
+                <div style="font-size: 13px; color: #5f6368;">💰 Баланс DeepSeek</div>
+                <div style="font-size: 24px; font-weight: bold; color: ${isLow ? '#d32f2f' : '#1a73e8'};">
+                    ${balanceCNY.toFixed(2)} CNY
+                </div>
+                <div style="font-size: 12px; color: #5f6368;">
+                    ≈ $${balance.usd || '?'} / ${balance.rub || '?'} ₽
+                </div>
+                ${isLow ? '<div style="margin-top: 8px; color: #d32f2f; font-size: 12px;">⚠️ Баланс ниже 1 CNY! Пора пополнять.</div>' : ''}
+            </div>
+            
+            <div style="margin-bottom: 16px; padding: 12px; background: #f1f3f4; border-radius: 12px;">
+                <div style="font-size: 13px; color: #5f6368;">💾 Кэш (PostgreSQL)</div>
+                <div style="font-size: 20px; font-weight: bold;">${cacheStats.total_answers || 0} ответов</div>
+                <div style="font-size: 12px; color: #5f6368;">Занято: ${cacheStats.total_mb || 0} МБ</div>
+            </div>
+            
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="window.open('https://platform.deepseek.com/top_up', '_blank')" style="background: #1a73e8; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">💰 Пополнить</button>
+                <button onclick="location.reload()" style="background: #5f6368; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🔄 Обновить</button>
+                <button onclick="logoutAdmin()" style="background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🚪 Выйти</button>
+            </div>
+        `;
+        
+        document.getElementById('adminContent').innerHTML = html;
+        
+    } catch (error) {
+        document.getElementById('adminContent').innerHTML = '<div style="color: red;">Ошибка загрузки данных</div>';
+    }
+});
+
+document.getElementById('closeAdminBtn')?.addEventListener('click', () => {
+    document.getElementById('adminPanel').style.display = 'none';
+});
+
+// Закрыть админку при клике вне её
+document.addEventListener('click', (e) => {
+    const panel = document.getElementById('adminPanel');
+    const icon = document.getElementById('adminButton');
+    if (panel && panel.style.display === 'block' && icon && !panel.contains(e.target) && !icon.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
+
+// === ФУНКЦИИ ЗАГРУЗКИ И ОТВЕТОВ ===
 function showLoading() {
     startTime = Date.now();
     

@@ -47,19 +47,14 @@ window.logoutAdmin = () => {
     alert('Вы вышли из админки');
 };
 
-// Открыть админ-панель
-document.getElementById('adminButton')?.addEventListener('click', async () => {
-    const panel = document.getElementById('adminPanel');
-    if (panel.style.display === 'block') {
-        panel.style.display = 'none';
-        return;
-    }
+// Функция загрузки данных в админ-панель
+async function loadAdminData() {
+    const adminContent = document.getElementById('adminContent');
+    if (!adminContent) return;
     
-    panel.style.display = 'block';
-    document.getElementById('adminContent').innerHTML = '<div class="loading">Загрузка...</div>';
+    adminContent.innerHTML = '<div class="loading">Загрузка...</div>';
     
     try {
-        // Запрашиваем баланс и статистику кэша
         const [balanceRes, cacheRes] = await Promise.all([
             fetch(`${BACKEND_URL}/api/balance`),
             fetch(`${BACKEND_URL}/admin/cache/bropedia2025`)
@@ -71,7 +66,7 @@ document.getElementById('adminButton')?.addEventListener('click', async () => {
         const balanceCNY = balance.cny || 0;
         const isLow = balanceCNY < 1;
         
-        let html = `
+        const html = `
             <div style="margin-bottom: 16px; padding: 12px; background: ${isLow ? '#ffebee' : '#e8f0fe'}; border-radius: 12px;">
                 <div style="font-size: 13px; color: #5f6368;">💰 Баланс DeepSeek</div>
                 <div style="font-size: 24px; font-weight: bold; color: ${isLow ? '#d32f2f' : '#1a73e8'};">
@@ -90,29 +85,57 @@ document.getElementById('adminButton')?.addEventListener('click', async () => {
             </div>
             
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button onclick="window.open('https://platform.deepseek.com/top_up', '_blank')" style="background: #1a73e8; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">💰 Пополнить</button>
-                <button onclick="location.reload()" style="background: #5f6368; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🔄 Обновить</button>
-                <button onclick="logoutAdmin()" style="background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🚪 Выйти</button>
+                <button id="adminTopUpBtn" style="background: #1a73e8; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">💰 Пополнить</button>
+                <button id="adminRefreshBtn" style="background: #5f6368; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🔄 Обновить</button>
+                <button id="adminLogoutBtn" style="background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px;">🚪 Выйти</button>
             </div>
         `;
         
-        document.getElementById('adminContent').innerHTML = html;
+        adminContent.innerHTML = html;
+        
+        // Назначаем обработчики кнопок внутри панели
+        document.getElementById('adminTopUpBtn')?.addEventListener('click', () => {
+            window.open('https://platform.deepseek.com/top_up', '_blank');
+        });
+        
+        document.getElementById('adminRefreshBtn')?.addEventListener('click', () => {
+            loadAdminData(); // Обновляем данные, не закрывая панель
+        });
+        
+        document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
+            logoutAdmin();
+        });
         
     } catch (error) {
-        document.getElementById('adminContent').innerHTML = '<div style="color: red;">Ошибка загрузки данных</div>';
+        adminContent.innerHTML = '<div style="color: red;">Ошибка загрузки данных</div>';
+    }
+}
+
+// Открыть/закрыть админ-панель
+const adminButton = document.getElementById('adminButton');
+const adminPanel = document.getElementById('adminPanel');
+const closeAdminBtn = document.getElementById('closeAdminBtn');
+
+adminButton?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (adminPanel.style.display === 'block') {
+        adminPanel.style.display = 'none';
+    } else {
+        adminPanel.style.display = 'block';
+        loadAdminData();
     }
 });
 
-document.getElementById('closeAdminBtn')?.addEventListener('click', () => {
-    document.getElementById('adminPanel').style.display = 'none';
+closeAdminBtn?.addEventListener('click', () => {
+    adminPanel.style.display = 'none';
 });
 
 // Закрыть админку при клике вне её
 document.addEventListener('click', (e) => {
-    const panel = document.getElementById('adminPanel');
-    const icon = document.getElementById('adminButton');
-    if (panel && panel.style.display === 'block' && icon && !panel.contains(e.target) && !icon.contains(e.target)) {
-        panel.style.display = 'none';
+    if (adminPanel && adminPanel.style.display === 'block') {
+        if (!adminPanel.contains(e.target) && !adminButton.contains(e.target)) {
+            adminPanel.style.display = 'none';
+        }
     }
 });
 

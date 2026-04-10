@@ -1,7 +1,7 @@
 {
   "name": "Bro-педия",
   "short_name": "Bro-педия",
-  "description": "Википедия по понятиям. Спроси — получишь ответ по-братски",
+  "description": "Википедия по понятиям",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#1a73e8",

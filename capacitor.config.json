@@ -4,6 +4,9 @@
   "webDir": "capacitor-web",
   "server": {
     "androidScheme": "https",
-    "url": "https://poserval.github.io/bro-pedia/"
+    "allowNavigation": ["*"]
+  },
+  "android": {
+    "allowMixedContent": true
   }
 }

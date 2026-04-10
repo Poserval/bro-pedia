@@ -25,6 +25,20 @@
         <div id="answerContainer" class="answer-container"></div>
     </div>
     
+    <!-- Админ-кнопка (показывается только админу) -->
+    <div id="adminButton" style="display: none; position: fixed; top: 15px; right: 15px; background: #1a73e8; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; font-size: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+        🔧
+    </div>
+    
+    <!-- Админ-панель (всплывающее окно) -->
+    <div id="adminPanel" style="display: none; position: fixed; top: 60px; right: 15px; width: 340px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1001; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border: 1px solid #e0e0e0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 18px;">🔧 Админ-панель</h3>
+            <button id="closeAdminBtn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #5f6368;">✕</button>
+        </div>
+        <div id="adminContent">Загрузка...</div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>

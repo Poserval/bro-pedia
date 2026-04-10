@@ -3,6 +3,7 @@
   "appName": "Bro-педия",
   "webDir": "capacitor-web",
   "server": {
+    "url": "https://poserval.github.io/bro-pedia/",
     "androidScheme": "https",
     "allowNavigation": ["*"]
   },

@@ -55,9 +55,8 @@ async function checkCache() {
 async function checkAdminPassword(password) {
     if (password === ADMIN_PASSWORD) {
         localStorage.setItem('admin_logged_in', 'true');
-        const adminIcon = document.getElementById('adminIcon');
-        if (adminIcon) adminIcon.style.display = 'flex';
         document.getElementById('adminModal').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
         alert('Добро пожаловать в админку, командир!');
         return true;
     } else {
@@ -97,6 +96,35 @@ if (adminPasswordInput) {
         if (e.key === 'Enter') {
             checkAdminPassword(adminPasswordInput.value);
         }
+    });
+}
+
+// === ОБРАБОТЧИКИ КНОПОК АДМИН-ПАНЕЛИ ===
+const checkBalanceBtn = document.getElementById('checkBalanceBtn');
+if (checkBalanceBtn) {
+    checkBalanceBtn.addEventListener('click', checkBalance);
+}
+
+const checkCacheBtn = document.getElementById('checkCacheBtn');
+if (checkCacheBtn) {
+    checkCacheBtn.addEventListener('click', checkCache);
+}
+
+const logoutAdminBtn = document.getElementById('logoutAdminBtn');
+if (logoutAdminBtn) {
+    logoutAdminBtn.addEventListener('click', () => {
+        localStorage.removeItem('admin_logged_in');
+        document.getElementById('adminPanel').style.display = 'none';
+        const adminIcon = document.getElementById('adminIcon');
+        if (adminIcon) adminIcon.style.display = 'none';
+        alert('Вы вышли из админки');
+    });
+}
+
+const closeAdminPanelBtn = document.getElementById('closeAdminPanelBtn');
+if (closeAdminPanelBtn) {
+    closeAdminPanelBtn.addEventListener('click', () => {
+        document.getElementById('adminPanel').style.display = 'none';
     });
 }
 

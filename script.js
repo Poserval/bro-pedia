@@ -290,12 +290,3 @@ function displayAnswer(answerHtml, showFullButton) {
         answerContainer.appendChild(button);
     }
 }
-
-// === PWA: РЕГИСТРАЦИЯ SERVICE WORKER ===
-if ('serviceWorker' in navigator && !isWebView()) {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-        console.log('✅ SW registered:', reg);
-    }).catch(err => {
-        console.log('❌ SW error:', err);
-    });
-}

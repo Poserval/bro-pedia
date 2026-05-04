@@ -10,7 +10,7 @@ let currentTitle = '';
 let loadingInterval = null;
 let startTime = null;
 
-// === АДМИН-ПАНЕЛЬ (только для сайта) ===
+// === АДМИН-ПАНЕЛЬ ===
 const ADMIN_PASSWORD = 'bropedia2025';
 
 // Проверяем, открыто ли приложение в WebView (APK)
@@ -19,10 +19,14 @@ function isWebView() {
     return userAgent.includes('wv') || userAgent.includes('android webview');
 }
 
-// Показываем иконку админки только в браузере (не в APK)
-if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
-    const adminIcon = document.getElementById('adminIcon');
-    if (adminIcon) adminIcon.style.display = 'flex';
+// Показываем иконку админки ТОЛЬКО в веб-версии (не в APK)
+const adminIcon = document.getElementById('adminIcon');
+if (adminIcon) {
+    if (!isWebView()) {
+        adminIcon.style.display = 'flex';
+    } else {
+        adminIcon.style.display = 'none';
+    }
 }
 
 // Функция проверки баланса DeepSeek
@@ -66,14 +70,14 @@ async function checkAdminPassword(password) {
 }
 
 // Обработчики админ-модалки
-const adminIcon = document.getElementById('adminIcon');
+const adminIconElem = document.getElementById('adminIcon');
 const adminModal = document.getElementById('adminModal');
 const adminLoginBtn = document.getElementById('adminLoginBtn');
 const adminCloseBtn = document.getElementById('adminCloseBtn');
 const adminPasswordInput = document.getElementById('adminPassword');
 
-if (adminIcon) {
-    adminIcon.addEventListener('click', () => {
+if (adminIconElem) {
+    adminIconElem.addEventListener('click', () => {
         if (adminModal) adminModal.style.display = 'flex';
     });
 }

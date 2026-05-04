@@ -200,4 +200,18 @@ body {
         padding: 16px;
         font-size: 16px;
     }
+
+    /* Стили для вариантов ответа (suggestion) */
+.suggestion {
+    color: #1a73e8;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.suggestion:hover {
+    color: #1557b0;
+    text-decoration: underline;
+}
 }

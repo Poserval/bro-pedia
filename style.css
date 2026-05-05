@@ -114,15 +114,27 @@ body {
     margin-bottom: 12px;
 }
 
+/* Стили для кликабельных имён (mention) */
 .mention {
     color: #1a73e8;
-    cursor: pointer;
     text-decoration: underline;
-    text-decoration-style: dotted;
+    cursor: pointer;
     font-weight: 500;
 }
 
 .mention:hover {
+    color: #1557b0;
+}
+
+/* Стили для вариантов ответа (suggestion) */
+.suggestion {
+    color: #1a73e8;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.suggestion:hover {
     color: #1557b0;
 }
 
@@ -200,18 +212,4 @@ body {
         padding: 16px;
         font-size: 16px;
     }
-
-    /* Стили для вариантов ответа (suggestion) */
-.suggestion,
-.mention {
-    color: #1a73e8;
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.suggestion:hover,
-.mention:hover {
-    color: #1557b0;
-}
 }

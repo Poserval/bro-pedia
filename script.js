@@ -289,4 +289,14 @@ function displayAnswer(answerHtml, showFullButton) {
         button.onclick = askFull;
         answerContainer.appendChild(button);
     }
+    // === ОБРАБОТКА КНОПОК-ПРИМЕРОВ ===
+document.querySelectorAll('.sample-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const question = btn.getAttribute('data-question');
+        if (question) {
+            document.getElementById('questionInput').value = question;
+            askQuestion();
+        }
+    });
+});
 }

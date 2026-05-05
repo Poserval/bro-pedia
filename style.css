@@ -26,12 +26,19 @@ body {
 
 /* Название */
 .logo {
-    font-size: 48px;
-    font-weight: 600;
+    font-size: 52px;
+    font-weight: 900;
     text-align: center;
-    color: #1a73e8;
-    margin-bottom: 0;
-    letter-spacing: -0.5px;
+    color: #ffcc00;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    text-shadow: 
+        5px 5px 0 #1a5bbf,
+        3px 3px 0 #0d3c6e,
+        0 0 10px rgba(0,0,0,0.25);
+    transform: scaleY(0.98);
+    image-rendering: crisp-edges;
 }
 
 /* Слоган */

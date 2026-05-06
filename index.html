@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#1a73e8">
     <link rel="icon" href="icons/icon-app-192.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- Название -->
-        <h1 class="logo">Bro-педия</h1>
+        <!-- Шапка с логотипом и иконкой админа -->
+        <div class="header">
+            <h1 class="logo">Bro-педия</h1>
+            <div id="adminIcon" class="admin-icon" style="display: none;">🔧</div>
+        </div>
         
         <!-- Слоган -->
         <p class="subtitle">Спроси — получишь ответ по-братски</p>
@@ -20,8 +24,8 @@
         <div class="sample-buttons">
             <button class="sample-btn" data-question="Кто такой Ип Ман?">🥋 Ип Ман</button>
             <button class="sample-btn" data-question="Что за Чебурашка?">🐻 Чебурашка</button>
-            <button class="sample-btn" data-question="Расскажи про Москву">🤖 Москва</button>
-            <button class="sample-btn" data-question="Кто такой Петросян?">✍️ Петросян</button>
+            <button class="sample-btn" data-question="Расскажи про DeepSeek">🤖 DeepSeek</button>
+            <button class="sample-btn" data-question="Кто написал Чебурашку?">✍️ Успенский</button>
         </div>
         
         <!-- Окно для вопроса -->
@@ -36,9 +40,26 @@
         <div id="answerContainer" class="answer-container"></div>
     </div>
     
-    <div id="adminIcon" style="display: none;">🔧</div>
-    <div id="adminModal" style="display: none;"></div>
-    <div id="adminPanel" style="display: none;"></div>
+    <!-- Модальное окно для ввода пароля -->
+    <div id="adminModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <h3>🔐 Вход в админку</h3>
+            <input type="password" id="adminPassword" placeholder="Пароль">
+            <div class="admin-modal-buttons">
+                <button id="adminLoginBtn">Войти</button>
+                <button id="adminCloseBtn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Админ-панель -->
+    <div id="adminPanel" class="admin-panel">
+        <h3>🔧 Админ-панель</h3>
+        <button id="checkBalanceBtn">💰 Проверить баланс</button>
+        <button id="checkCacheBtn">📦 Размер кэша</button>
+        <button id="logoutAdminBtn">🚪 Выйти</button>
+        <button id="closeAdminPanelBtn">✖️ Закрыть</button>
+    </div>
     
     <script src="script.js"></script>
 </body>

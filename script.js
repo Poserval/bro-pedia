@@ -9,17 +9,6 @@ let currentTitle = '';
 let loadingInterval = null;
 let startTime = null;
 
-// === ОПРЕДЕЛЕНИЕ WEBVIEW (APK) И СКРЫТИЕ АДМИНКИ ===
-function isWebView() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    return userAgent.includes('wv') || userAgent.includes('android webview');
-}
-
-// Если это WebView (APK), вешаем класс на body для скрытия админки через CSS
-if (isWebView()) {
-    document.body.classList.add('webview');
-}
-
 // === УМНЫЕ КНОПКИ: ИСТОРИЯ ПОСЛЕДНИХ УНИКАЛЬНЫХ ЗАПРОСОВ ===
 const DEFAULT_QUESTIONS = [
     "Ип Ман",
@@ -32,7 +21,10 @@ function getQuestionsHistory() {
     const stored = localStorage.getItem("questionsHistory");
     if (stored) {
         try {
-            return JSON.parse(stored);
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
         } catch(e) { console.log("Parse error", e); }
     }
     return [...DEFAULT_QUESTIONS];
@@ -52,11 +44,8 @@ function updateButtons(history) {
 function addQuestionToHistory(question) {
     if (!question || question.trim() === "") return;
     let history = getQuestionsHistory();
-    // Удаляем этот вопрос, если он уже был в списке
     history = history.filter(q => q !== question);
-    // Добавляем в конец (как самый свежий)
     history.push(question);
-    // Оставляем только 4 последних
     if (history.length > 4) history = history.slice(-4);
     saveQuestionsHistory(history);
     updateButtons(history);
@@ -71,10 +60,23 @@ function initButtons() {
 // === АДМИН-ПАНЕЛЬ ===
 const ADMIN_PASSWORD = 'bropedia2025';
 
-// Показываем иконку админки только в браузере (не в APK)
+function isWebView() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes('wv') || userAgent.includes('android webview');
+}
+
 if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
     const adminIcon = document.getElementById('adminIcon');
     if (adminIcon) adminIcon.style.display = 'flex';
+}
+
+// Принудительное скрытие админки в APK
+if (isWebView()) {
+    const ids = ['adminIcon', 'adminModal', 'adminPanel'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
 }
 
 async function checkBalance() {
@@ -147,7 +149,6 @@ if (adminPasswordInput) {
     });
 }
 
-// Кнопки админ-панели
 const checkBalanceBtn = document.getElementById('checkBalanceBtn');
 if (checkBalanceBtn) checkBalanceBtn.addEventListener('click', checkBalance);
 
@@ -176,17 +177,6 @@ if (closeAdminPanelBtn) {
 askButton.addEventListener('click', askQuestion);
 questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') askQuestion();
-});
-
-// Обработка нажатий на динамические кнопки
-document.querySelectorAll('.sample-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const question = btn.textContent;
-        if (question) {
-            questionInput.value = question;
-            askQuestion();
-        }
-    });
 });
 
 function showLoading() {
@@ -230,7 +220,6 @@ async function askQuestion() {
     const question = questionInput.value.trim();
     if (!question) return;
     
-    // Добавляем вопрос в историю кнопок
     addQuestionToHistory(question);
     
     currentQuestion = question;
@@ -327,15 +316,20 @@ function displayAnswer(answerHtml, showFullButton) {
         button.onclick = askFull;
         answerContainer.appendChild(button);
     }
-
-    // Принудительное скрытие админки в APK
-if (isWebView()) {
-    const ids = ['adminIcon', 'adminModal', 'adminPanel'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
 }
 
-// Инициализируем кнопки при загрузке страницы
-initButtons();
+// Инициализируем кнопки после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    initButtons();
+    
+    // Обработка нажатий на динамические кнопки
+    document.querySelectorAll('.sample-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const question = btn.textContent;
+            if (question) {
+                questionInput.value = question;
+                askQuestion();
+            }
+        });
+    });
+});

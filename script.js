@@ -2,7 +2,6 @@ const questionInput = document.getElementById('questionInput');
 const askButton = document.getElementById('askButton');
 const answerContainer = document.getElementById('answerContainer');
 
-// Определяем адрес бэкенда
 const BACKEND_URL = 'https://bro-pedia.onrender.com';
 
 let currentQuestion = '';
@@ -19,17 +18,13 @@ function isWebView() {
     return userAgent.includes('wv') || userAgent.includes('android webview');
 }
 
-// Показываем иконку админки ТОЛЬКО в веб-версии (не в APK)
-const adminIcon = document.getElementById('adminIcon');
-if (adminIcon) {
-    if (!isWebView()) {
-        adminIcon.style.display = 'flex';
-    } else {
-        adminIcon.style.display = 'none';
-    }
+// Показываем иконку админки ТОЛЬКО в браузере (не в APK)
+if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
+    const adminIcon = document.getElementById('adminIcon');
+    if (adminIcon) adminIcon.style.display = 'flex';
 }
 
-// Функция проверки баланса DeepSeek
+// Функция проверки баланса
 async function checkBalance() {
     try {
         const response = await fetch(`${BACKEND_URL}/admin/balance/${ADMIN_PASSWORD}`);
@@ -61,7 +56,6 @@ async function checkAdminPassword(password) {
         localStorage.setItem('admin_logged_in', 'true');
         document.getElementById('adminModal').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        alert('Добро пожаловать в админку, командир!');
         return true;
     } else {
         alert('Неверный пароль, командир!');
@@ -70,14 +64,14 @@ async function checkAdminPassword(password) {
 }
 
 // Обработчики админ-модалки
-const adminIconElem = document.getElementById('adminIcon');
+const adminIcon = document.getElementById('adminIcon');
 const adminModal = document.getElementById('adminModal');
 const adminLoginBtn = document.getElementById('adminLoginBtn');
 const adminCloseBtn = document.getElementById('adminCloseBtn');
 const adminPasswordInput = document.getElementById('adminPassword');
 
-if (adminIconElem) {
-    adminIconElem.addEventListener('click', () => {
+if (adminIcon) {
+    adminIcon.addEventListener('click', () => {
         if (adminModal) adminModal.style.display = 'flex';
     });
 }
@@ -103,16 +97,12 @@ if (adminPasswordInput) {
     });
 }
 
-// === ОБРАБОТЧИКИ КНОПОК АДМИН-ПАНЕЛИ ===
+// Кнопки админ-панели
 const checkBalanceBtn = document.getElementById('checkBalanceBtn');
-if (checkBalanceBtn) {
-    checkBalanceBtn.addEventListener('click', checkBalance);
-}
+if (checkBalanceBtn) checkBalanceBtn.addEventListener('click', checkBalance);
 
 const checkCacheBtn = document.getElementById('checkCacheBtn');
-if (checkCacheBtn) {
-    checkCacheBtn.addEventListener('click', checkCache);
-}
+if (checkCacheBtn) checkCacheBtn.addEventListener('click', checkCache);
 
 const logoutAdminBtn = document.getElementById('logoutAdminBtn');
 if (logoutAdminBtn) {
@@ -132,22 +122,29 @@ if (closeAdminPanelBtn) {
     });
 }
 
-// === ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ ===
+// === ОСНОВНАЯ ЛОГИКА ===
 askButton.addEventListener('click', askQuestion);
 questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') askQuestion();
 });
 
+// Обработка кнопок-примеров
+document.querySelectorAll('.sample-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const question = btn.getAttribute('data-question');
+        if (question) {
+            questionInput.value = question;
+            askQuestion();
+        }
+    });
+});
+
 function showLoading() {
     startTime = Date.now();
-    
-    const steps = ['🔍 Ищу в закромах...', '🤔 Думаю как по понятиям...', '✍️ Нанизываю слоган...', '✨ Почти готово...'];
-    let stepIndex = 0;
-    
     answerContainer.innerHTML = `
         <div class="loading-container">
             <div class="loading-spinner"></div>
-            <div class="loading-text">${steps[0]}</div>
+            <div class="loading-text">🔍 Ищу в закромах...</div>
             <div class="loading-timer">0 сек</div>
         </div>
     `;
@@ -156,12 +153,6 @@ function showLoading() {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const timerEl = document.querySelector('.loading-timer');
         if (timerEl) timerEl.textContent = `${elapsed} сек`;
-        
-        if (elapsed > 3 && stepIndex < steps.length - 1) {
-            stepIndex++;
-            const stepText = document.querySelector('.loading-text');
-            if (stepText) stepText.textContent = steps[stepIndex];
-        }
         
         if (elapsed > 15) {
             const stepText = document.querySelector('.loading-text');
@@ -209,9 +200,9 @@ async function askQuestion() {
         hideLoading();
         answerContainer.innerHTML = `
             <div class="loading-container">
-                <div style="color: #d32f2f; margin-bottom: 10px;">⚠️ Что-то пошло не так, братан</div>
+                <div style="color: #d32f2f;">⚠️ Что-то пошло не так, братан</div>
                 <div style="color: #5f6368;">Сервер ещё не проснулся. Попробуй через минуту.</div>
-                <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #1a73e8; color: white; border: none; border-radius: 20px; cursor: pointer;">🔄 Обновить</button>
+                <button onclick="location.reload()">🔄 Обновить</button>
             </div>
         `;
     }
@@ -219,16 +210,13 @@ async function askQuestion() {
 
 async function askFull() {
     showLoading();
-    
     try {
         const response = await fetch(`${BACKEND_URL}/api/ask/full`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: currentQuestion, title: currentTitle })
         });
-        
         if (!response.ok) throw new Error('Ошибка сервера');
-        
         const data = await response.json();
         hideLoading();
         displayAnswer(data.answer, false);
@@ -240,16 +228,13 @@ async function askFull() {
 
 async function askSuggestion(suggestion) {
     showLoading();
-    
     try {
         const response = await fetch(`${BACKEND_URL}/api/ask/suggestion`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ suggestion: suggestion })
         });
-        
         if (!response.ok) throw new Error('Ошибка сервера');
-        
         const data = await response.json();
         currentTitle = data.title || '';
         hideLoading();
@@ -289,14 +274,4 @@ function displayAnswer(answerHtml, showFullButton) {
         button.onclick = askFull;
         answerContainer.appendChild(button);
     }
-    // === ОБРАБОТКА КНОПОК-ПРИМЕРОВ ===
-document.querySelectorAll('.sample-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const question = btn.getAttribute('data-question');
-        if (question) {
-            document.getElementById('questionInput').value = question;
-            askQuestion();
-        }
-    });
-});
 }

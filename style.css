@@ -40,14 +40,14 @@ body {
     padding: var(--top-offset) var(--body-padding) var(--body-padding) var(--body-padding);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;  /* ← прижимаем всё к верху */
 }
 
 .container {
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
-    margin-top: -100px;  /* ← добавь отрицательный отступ сверху */
+    margin-top: -20px;  /* ← добавь отрицательный отступ сверху */
     padding: var(--container-padding-top) var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;

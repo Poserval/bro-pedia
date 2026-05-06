@@ -5,7 +5,7 @@
 }
 
 :root {
-    --top-offset: 10px;
+    --top-offset: 0px;
     --body-padding: 10px;
     --container-padding-top: 10px;
     --container-padding-sides: 20px;
@@ -47,7 +47,7 @@ body {
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
-    margin-top: -10px;  /* ← добавь отрицательный отступ сверху */
+    margin-top: -100px;  /* ← добавь отрицательный отступ сверху */
     padding: var(--container-padding-top) var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;

@@ -5,7 +5,7 @@
 }
 
 :root {
-    --top-offset: 15px;
+    --top-offset: 10px;
     --body-padding: 10px;
     --container-padding-top: 10px;
     --container-padding-sides: 20px;
@@ -170,6 +170,37 @@ body {
     margin-top: var(--answer-margin-top);
 }
 
+/* Кнопка "Подробнее" — синяя, скошенные края, в правом нижнем углу */
+.more-button {
+    display: block;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    width: auto;
+    margin-top: 16px;
+    margin-left: auto;
+    margin-right: 0;
+    clip-path: polygon(12px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12px);
+    border-radius: 0;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.more-button:hover {
+    background: #1557b0;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.15);
+}
+
+.more-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
 .mention, .suggestion {
     color: var(--primary-color);
     text-decoration: underline;
@@ -181,6 +212,7 @@ body {
     color: var(--primary-hover);
 }
 
+/* Админка скрыта */
 #adminIcon,
 #adminModal,
 #adminPanel,
@@ -216,4 +248,9 @@ body {
     }
     .sample-btn::before { left: 6px; }
     .sample-btn::after { right: 6px; }
+    .more-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 10px);
+    }
 }

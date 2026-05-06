@@ -5,12 +5,9 @@
 }
 
 :root {
-    /* === ОСНОВНЫЕ ОТСТУПЫ === */
     --top-offset: 20px;
     --container-padding-sides: 20px;
     --container-gap: 16px;
-    
-    /* === РАЗМЕРЫ === */
     --logo-font-size: 52px;
     --subtitle-font-size: 16px;
     --input-padding: 14px 20px;
@@ -19,8 +16,6 @@
     --ask-button-font-size: 16px;
     --answer-padding: 16px;
     --answer-font-size: 16px;
-    
-    /* === ЦВЕТА === */
     --primary-color: #1a73e8;
     --primary-hover: #1557b0;
     --text-dark: #202124;
@@ -206,12 +201,35 @@ body {
     color: var(--primary-hover);
 }
 
-/* Скрытие админки только в WebView (APK) */
-.webview #adminIcon,
-.webview #adminModal,
+/* === АДМИНКА === */
+#adminIcon {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    background: #1a73e8;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+#adminModal, #adminPanel {
+    display: none;
+}
+
+.webview #adminIcon, 
+.webview #adminModal, 
 .webview #adminPanel {
     display: none !important;
     visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 @media (max-width: 600px) {

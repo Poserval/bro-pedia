@@ -9,20 +9,21 @@
     --body-padding: 10px;
     --container-padding-top: 10px;
     --container-padding-sides: 20px;
-    --container-padding-bottom: 20px;
-    --container-gap: 20px;
+    --container-padding-bottom: 0px;
+    --container-gap: 16px;
     --logo-margin-bottom: 0px;
     --logo-font-size: 52px;
     --subtitle-margin-bottom: 0px;
     --subtitle-font-size: 16px;
-    --input-padding: 16px 20px;
+    --sample-buttons-gap: 12px;
+    --sample-buttons-margin-bottom: 8px;
+    --input-padding: 14px 20px;
     --input-font-size: 16px;
-    --ask-button-padding: 14px 20px;
+    --ask-button-padding: 12px 20px;
     --ask-button-font-size: 16px;
-    --answer-padding: 24px;
+    --answer-padding: 16px;
     --answer-font-size: 16px;
-    --answer-min-height: 120px;
-    --answer-margin-top: 10px;
+    --answer-margin-top: 8px;
     --primary-color: #1a73e8;
     --primary-hover: #1557b0;
     --text-dark: #202124;
@@ -36,22 +37,25 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     background: #ffffff;
     color: var(--text-dark);
-    min-height: 100vh;
+    height: 100vh;
+    margin: 0;
     padding: var(--top-offset) var(--body-padding) var(--body-padding) var(--body-padding);
     display: flex;
     justify-content: center;
-    align-items: flex-start;  /* ← прижимаем всё к верху */
+    align-items: flex-start;
+    overflow-y: auto;
 }
 
 .container {
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
-    margin-top: 10px;  /* ← добавь отрицательный отступ сверху */
+    margin-top: 20px;
     padding: var(--container-padding-top) var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;
     gap: var(--container-gap);
+    height: calc(100vh - 40px);
 }
 
 .logo {
@@ -66,6 +70,7 @@ body {
     transform: scaleY(0.98);
     image-rendering: crisp-edges;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .subtitle {
@@ -73,22 +78,23 @@ body {
     color: var(--text-light);
     font-size: var(--subtitle-font-size);
     margin-bottom: var(--subtitle-margin-bottom);
+    flex-shrink: 0;
 }
 
-/* 4 кнопки-примера (индустриальный стиль, две колонки, болты) */
 .sample-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 24px;
+    gap: var(--sample-buttons-gap);
+    margin-bottom: var(--sample-buttons-margin-bottom);
+    flex-shrink: 0;
 }
 
 .sample-btn {
     background: linear-gradient(145deg, #c2c2c2, #a8a8a8);
     border: 1px solid #6e6e6e;
     border-radius: 16px;
-    padding: 14px 8px;
-    font-size: 16px;
+    padding: 12px 8px;
+    font-size: 15px;
     font-weight: bold;
     color: #1e1e1e;
     text-align: center;
@@ -101,7 +107,6 @@ body {
     position: relative;
 }
 
-/* Заклёпки сверху */
 .sample-btn::before,
 .sample-btn::after {
     content: "";
@@ -124,6 +129,7 @@ body {
 
 .search-box {
     width: 100%;
+    flex-shrink: 0;
 }
 
 #questionInput {
@@ -153,6 +159,7 @@ body {
     cursor: pointer;
     font-weight: 500;
     transition: background 0.2s;
+    flex-shrink: 0;
 }
 
 .ask-button:hover {
@@ -167,11 +174,12 @@ body {
     line-height: 1.5;
     color: var(--text-dark);
     border: 1px solid #e8eaed;
-    min-height: var(--answer-min-height);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
     margin-top: var(--answer-margin-top);
 }
 
-/* Кнопка "Подробнее" — синяя, скошенные края, в правом нижнем углу */
 .more-button {
     display: block;
     background: #1a73e8;
@@ -232,14 +240,16 @@ body {
 @media (max-width: 600px) {
     :root {
         --logo-font-size: 36px;
-        --input-padding: 14px 18px;
-        --ask-button-padding: 12px 18px;
-        --answer-padding: 18px;
-        --top-offset: 30px;
+        --input-padding: 12px 16px;
+        --ask-button-padding: 10px 16px;
+        --answer-padding: 14px;
+        --container-gap: 12px;
+        --sample-buttons-gap: 8px;
+        --answer-margin-top: 4px;
     }
     .sample-btn {
-        font-size: 13px;
-        padding: 10px 6px;
+        font-size: 12px;
+        padding: 8px 4px;
     }
     .sample-btn::before,
     .sample-btn::after {
@@ -250,8 +260,11 @@ body {
     .sample-btn::before { left: 6px; }
     .sample-btn::after { right: 6px; }
     .more-button {
-        padding: 10px 20px;
+        padding: 8px 16px;
         font-size: 14px;
         clip-path: polygon(10px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 10px);
+    }
+    .container {
+        margin-top: 10px;
     }
 }

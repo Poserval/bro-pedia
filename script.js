@@ -51,7 +51,6 @@ function addQuestionToHistory(question) {
     updateButtons(history);
 }
 
-// Инициализация кнопок при загрузке
 function initButtons() {
     const history = getQuestionsHistory();
     updateButtons(history);
@@ -70,7 +69,6 @@ if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
     if (adminIcon) adminIcon.style.display = 'flex';
 }
 
-// Принудительное скрытие админки в APK
 if (isWebView()) {
     const ids = ['adminIcon', 'adminModal', 'adminPanel'];
     ids.forEach(id => {
@@ -106,8 +104,10 @@ async function checkCache() {
 async function checkAdminPassword(password) {
     if (password === ADMIN_PASSWORD) {
         localStorage.setItem('admin_logged_in', 'true');
-        document.getElementById('adminModal').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
+        const modal = document.getElementById('adminModal');
+        const panel = document.getElementById('adminPanel');
+        if (modal) modal.style.display = 'none';
+        if (panel) panel.style.display = 'block';
         return true;
     } else {
         alert('Неверный пароль, командир!');
@@ -115,7 +115,6 @@ async function checkAdminPassword(password) {
     }
 }
 
-// Обработчики админ-модалки
 const adminIcon = document.getElementById('adminIcon');
 const adminModal = document.getElementById('adminModal');
 const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -159,9 +158,10 @@ const logoutAdminBtn = document.getElementById('logoutAdminBtn');
 if (logoutAdminBtn) {
     logoutAdminBtn.addEventListener('click', () => {
         localStorage.removeItem('admin_logged_in');
-        document.getElementById('adminPanel').style.display = 'none';
-        const adminIcon = document.getElementById('adminIcon');
-        if (adminIcon) adminIcon.style.display = 'none';
+        const panel = document.getElementById('adminPanel');
+        const icon = document.getElementById('adminIcon');
+        if (panel) panel.style.display = 'none';
+        if (icon) icon.style.display = 'none';
         alert('Вы вышли из админки');
     });
 }
@@ -169,7 +169,8 @@ if (logoutAdminBtn) {
 const closeAdminPanelBtn = document.getElementById('closeAdminPanelBtn');
 if (closeAdminPanelBtn) {
     closeAdminPanelBtn.addEventListener('click', () => {
-        document.getElementById('adminPanel').style.display = 'none';
+        const panel = document.getElementById('adminPanel');
+        if (panel) panel.style.display = 'none';
     });
 }
 
@@ -194,17 +195,12 @@ function showLoading() {
         const timerEl = document.querySelector('.loading-timer');
         if (timerEl) timerEl.textContent = `${elapsed} сек`;
         
-        if (elapsed > 15) {
-            const stepText = document.querySelector('.loading-text');
-            if (stepText && !stepText.textContent.includes('не сплю')) {
-                stepText.textContent = '🥱 Сеть тупит, но я не сплю...';
-            }
+        const stepText = document.querySelector('.loading-text');
+        if (elapsed > 15 && stepText && !stepText.textContent.includes('не сплю')) {
+            stepText.textContent = '🥱 Сеть тупит, но я не сплю...';
         }
-        if (elapsed > 25) {
-            const stepText = document.querySelector('.loading-text');
-            if (stepText && !stepText.textContent.includes('сложная')) {
-                stepText.textContent = '🤯 Тяжёлый вопрос, но я справлюсь!';
-            }
+        if (elapsed > 25 && stepText && !stepText.textContent.includes('сложная')) {
+            stepText.textContent = '🤯 Тяжёлый вопрос, но я справлюсь!';
         }
     }, 1000);
 }
@@ -221,7 +217,6 @@ async function askQuestion() {
     if (!question) return;
     
     addQuestionToHistory(question);
-    
     currentQuestion = question;
     showLoading();
     
@@ -318,11 +313,8 @@ function displayAnswer(answerHtml, showFullButton) {
     }
 }
 
-// Инициализируем кнопки после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     initButtons();
-    
-    // Обработка нажатий на динамические кнопки
     document.querySelectorAll('.sample-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const question = btn.textContent;

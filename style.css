@@ -1,4 +1,28 @@
-/* === АДМИНКА === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #ffffff;
+    color: #202124;
+    height: 100vh;
+    padding: 8px 12px 0 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Шапка с логотипом и иконкой админа */
 .header {
     display: flex;
     align-items: center;
@@ -7,6 +31,23 @@
     margin-bottom: 5px;
 }
 
+/* Название */
+.logo {
+    font-size: 48px;
+    font-weight: 900;
+    text-align: center;
+    color: #ffcc00;
+    margin: 0;
+    letter-spacing: 2px;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    text-shadow: 
+        4px 4px 0 #1a5bbf,
+        2px 2px 0 #0d3c6e,
+        0 0 8px rgba(0,0,0,0.25);
+    transform: scaleY(0.98);
+}
+
+/* Иконка админа (шестерёнка) */
 .admin-icon {
     position: absolute;
     right: 0;
@@ -30,7 +71,137 @@
     transform: translateY(-50%) scale(1.05);
 }
 
-/* Модальное окно */
+/* Слоган */
+.subtitle {
+    text-align: center;
+    color: #5f6368;
+    font-size: 14px;
+    margin: 5px 0 15px 0;
+}
+
+/* Контейнер для 4 кнопок — две в ряд */
+.sample-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Стиль кнопки — прибитая гвоздиками */
+.sample-btn {
+    background: #f5f3f0;
+    border: 2px solid #8b7a6b;
+    border-radius: 12px;
+    padding: 14px 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e2f;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        0 4px 6px rgba(0,0,0,0.1),
+        0 0 0 2px #d4c5b0,
+        0 0 0 5px #8b7a6b;
+    margin: 6px 0;
+}
+
+.sample-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        0 6px 10px rgba(0,0,0,0.15),
+        0 0 0 2px #d4c5b0,
+        0 0 0 5px #6b5b4e;
+}
+
+/* Окно для вопроса */
+.search-box {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+#questionInput {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 2px solid #dadce0;
+    border-radius: 28px;
+    outline: none;
+    font-family: inherit;
+}
+
+#questionInput:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+/* Кнопка Спросить */
+.ask-button {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 28px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 16px;
+    transition: background 0.2s;
+}
+
+.ask-button:hover {
+    background: #1557b0;
+}
+
+/* Окно для ответа — растянуто до низа */
+.answer-container {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #202124;
+    border: 1px solid #e8eaed;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Стили для кликабельных имён */
+.mention, .suggestion {
+    color: #1a73e8;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.mention:hover, .suggestion:hover {
+    color: #1557b0;
+}
+
+/* Кнопка "Подробнее" */
+.more-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+}
+
+.more-button:hover {
+    background: #1557b0;
+}
+
+/* === АДМИНКА === */
+
+/* Модальное окно входа */
 .admin-modal {
     display: none;
     position: fixed;
@@ -66,6 +237,12 @@
     font-size: 16px;
 }
 
+.admin-modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
 .admin-modal-buttons button {
     background: #1a73e8;
     color: white;
@@ -73,7 +250,6 @@
     padding: 10px 20px;
     border-radius: 24px;
     cursor: pointer;
-    margin: 0 5px;
 }
 
 .admin-modal-buttons button:last-child {
@@ -81,7 +257,7 @@
     color: black;
 }
 
-/* Админ-панель */
+/* Панель админа */
 .admin-panel {
     display: none;
     position: fixed;
@@ -116,4 +292,51 @@
 .admin-panel button:last-child {
     background: #ccc;
     color: black;
+}
+
+/* Анимация загрузки */
+.loading-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 15px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #1a73e8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #5f6368;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.loading-timer {
+    color: #1a73e8;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: monospace;
+    margin-top: 10px;
+}
+
+/* Адаптив для телефонов */
+@media (max-width: 500px) {
+    .logo { font-size: 36px; }
+    .admin-icon { width: 30px; height: 30px; font-size: 14px; }
+    .sample-btn { font-size: 13px; padding: 10px 6px; }
+    #questionInput { padding: 12px 16px; }
+    .ask-button { padding: 12px 16px; }
+    .answer-container { padding: 14px; }
+    .admin-modal-content { padding: 20px; max-width: 260px; }
+    .admin-panel { padding: 20px; min-width: 240px; }
 }

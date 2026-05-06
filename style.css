@@ -4,51 +4,30 @@
     box-sizing: border-box;
 }
 
-/* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ === */
 :root {
-    /* Общий сдвиг всей страницы вниз (для выреза камеры/notch) */
     --top-offset: 45px;
-    
-    /* Отступы */
     --body-padding: 10px;
     --container-padding-top: 10px;
     --container-padding-sides: 20px;
     --container-padding-bottom: 20px;
     --container-gap: 20px;
-    
-    /* Название (логотип) */
     --logo-margin-bottom: 0px;
     --logo-font-size: 52px;
-    
-    /* Слоган */
     --subtitle-margin-bottom: 0px;
     --subtitle-font-size: 16px;
-    
-    /* Кнопки-примеры */
-    --sample-buttons-gap: 10px;
-    --sample-buttons-margin-bottom: 10px;
-    
-    /* Поле ввода */
     --input-padding: 16px 20px;
     --input-font-size: 16px;
-    
-    /* Кнопка "Спросить" */
     --ask-button-padding: 14px 20px;
     --ask-button-font-size: 16px;
-    
-    /* Окно ответа */
     --answer-padding: 24px;
     --answer-font-size: 16px;
     --answer-min-height: 120px;
     --answer-margin-top: 10px;
-    
-    /* Цвета */
     --primary-color: #1a73e8;
     --primary-hover: #1557b0;
     --text-dark: #202124;
     --text-light: #5f6368;
     --bg-gray: #f8f9fa;
-    --bg-button: #f1f3f4;
     --logo-color: #ffcc00;
     --logo-shadow: #1a5bbf;
 }
@@ -74,7 +53,6 @@ body {
     gap: var(--container-gap);
 }
 
-/* Название */
 .logo {
     font-size: var(--logo-font-size);
     font-weight: 900;
@@ -83,15 +61,11 @@ body {
     margin-bottom: var(--logo-margin-bottom);
     letter-spacing: 2px;
     font-family: 'Press Start 2P', 'Courier New', monospace;
-    text-shadow: 
-        5px 5px 0 var(--logo-shadow),
-        3px 3px 0 #0d3c6e,
-        0 0 10px rgba(0,0,0,0.25);
+    text-shadow: 5px 5px 0 var(--logo-shadow), 3px 3px 0 #0d3c6e, 0 0 10px rgba(0,0,0,0.25);
     transform: scaleY(0.98);
     image-rendering: crisp-edges;
 }
 
-/* Слоган */
 .subtitle {
     text-align: center;
     color: var(--text-light);
@@ -99,32 +73,53 @@ body {
     margin-bottom: var(--subtitle-margin-bottom);
 }
 
-/* 4 кнопки-примера */
+/* 4 кнопки-примера (индустриальный стиль, две колонки, болты) */
 .sample-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sample-buttons-gap);
-    justify-content: center;
-    margin-bottom: var(--sample-buttons-margin-bottom);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
 }
 
 .sample-btn {
-    background: var(--bg-button);
-    border: none;
-    border-radius: 24px;
-    padding: 8px 16px;
-    font-size: 14px;
-    color: var(--primary-color);
+    background: linear-gradient(145deg, #c2c2c2, #a8a8a8);
+    border: 1px solid #6e6e6e;
+    border-radius: 16px;
+    padding: 14px 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #1e1e1e;
+    text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: 0.05s linear;
+    box-shadow: 
+        4px 4px 0px 0px #4b4b4b,
+        inset -1px -1px 0 0 #5a5a5a,
+        inset 1px 1px 0 0 #efefef;
+    position: relative;
 }
 
-.sample-btn:hover {
-    background: #e8eaed;
-    transform: scale(1.02);
+/* Заклёпки сверху */
+.sample-btn::before,
+.sample-btn::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, #3a3a3a 30%, #1f1f1f 80%);
+    border-radius: 50%;
+    top: 6px;
+    box-shadow: 0 0 0 1px #00000055;
 }
 
-/* Окно для вопроса */
+.sample-btn::before { left: 8px; }
+.sample-btn::after { right: 8px; }
+
+.sample-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0px 0px #4b4b4b;
+}
+
 .search-box {
     width: 100%;
 }
@@ -145,7 +140,6 @@ body {
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
-/* Кнопка Спросить */
 .ask-button {
     width: 100%;
     padding: var(--ask-button-padding);
@@ -163,7 +157,6 @@ body {
     background: var(--primary-hover);
 }
 
-/* Окно для ответа */
 .answer-container {
     background: var(--bg-gray);
     border-radius: 16px;
@@ -176,7 +169,6 @@ body {
     margin-top: var(--answer-margin-top);
 }
 
-/* Стили для кликабельных имён и предложений */
 .mention, .suggestion {
     color: var(--primary-color);
     text-decoration: underline;
@@ -188,7 +180,6 @@ body {
     color: var(--primary-hover);
 }
 
-/* === ЖЕСТКОЕ СКРЫТИЕ АДМИНКИ (без удаления функционала) === */
 #adminIcon,
 #adminModal,
 #adminPanel,
@@ -204,7 +195,6 @@ body {
     overflow: hidden !important;
 }
 
-/* Адаптив под мобильные устройства */
 @media (max-width: 600px) {
     :root {
         --logo-font-size: 36px;
@@ -214,7 +204,15 @@ body {
         --top-offset: 30px;
     }
     .sample-btn {
-        font-size: 12px;
-        padding: 6px 12px;
+        font-size: 13px;
+        padding: 10px 6px;
     }
+    .sample-btn::before,
+    .sample-btn::after {
+        width: 8px;
+        height: 8px;
+        top: 4px;
+    }
+    .sample-btn::before { left: 6px; }
+    .sample-btn::after { right: 6px; }
 }

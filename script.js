@@ -64,17 +64,15 @@ function isWebView() {
     return userAgent.includes('wv') || userAgent.includes('android webview');
 }
 
+// Если это WebView (APK), добавляем класс для скрытия админки через CSS
+if (isWebView()) {
+    document.body.classList.add('webview');
+}
+
+// Показываем иконку админки только в браузере, если есть флаг
 if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
     const adminIcon = document.getElementById('adminIcon');
     if (adminIcon) adminIcon.style.display = 'flex';
-}
-
-if (isWebView()) {
-    const ids = ['adminIcon', 'adminModal', 'adminPanel'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
 }
 
 async function checkBalance() {

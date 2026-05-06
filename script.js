@@ -327,6 +327,14 @@ function displayAnswer(answerHtml, showFullButton) {
         button.onclick = askFull;
         answerContainer.appendChild(button);
     }
+
+    // Принудительное скрытие админки в APK
+if (isWebView()) {
+    const ids = ['adminIcon', 'adminModal', 'adminPanel'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
 }
 
 // Инициализируем кнопки при загрузке страницы

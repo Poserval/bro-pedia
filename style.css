@@ -4,343 +4,203 @@
     box-sizing: border-box;
 }
 
+/* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ === */
+:root {
+    /* Общий отступ сверху (под камеру) — меняй это значение */
+    --top-offset: 60px;
+    
+    /* Отступы */
+    --body-padding-sides: 10px;
+    --body-padding-bottom: 10px;
+    --container-padding-sides: 20px;
+    --container-padding-bottom: 20px;
+    --container-gap: 20px;
+    
+    /* Название (логотип) */
+    --logo-margin-bottom: 0px;
+    --logo-font-size: 52px;
+    
+    /* Слоган */
+    --subtitle-margin-bottom: 0px;
+    --subtitle-font-size: 16px;
+    
+    /* Кнопки-примеры */
+    --sample-buttons-gap: 10px;
+    --sample-buttons-margin-bottom: 10px;
+    
+    /* Поле ввода */
+    --input-padding: 16px 20px;
+    --input-font-size: 16px;
+    
+    /* Кнопка "Спросить" */
+    --ask-button-padding: 14px 20px;
+    --ask-button-font-size: 16px;
+    
+    /* Окно ответа */
+    --answer-padding: 24px;
+    --answer-font-size: 16px;
+    --answer-min-height: 120px;
+    --answer-margin-top: 10px;
+    
+    /* Безопасная зона для выреза (notch) */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    
+    /* Цвета */
+    --primary-color: #1a73e8;
+    --primary-hover: #1557b0;
+    --text-dark: #202124;
+    --text-light: #5f6368;
+    --bg-gray: #f8f9fa;
+    --bg-button: #f1f3f4;
+    --logo-color: #ffcc00;
+    --logo-shadow: #1a5bbf;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     background: #ffffff;
-    color: #202124;
-    height: 100vh;
-    padding: 8px 12px 0 12px;
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: calc(var(--top-offset) + var(--safe-area-top)) var(--body-padding-sides) var(--body-padding-bottom);
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .container {
     max-width: 800px;
     width: 100%;
+    margin: 0 auto;
+    padding: 0 var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;
-    height: 100%;
-}
-
-/* Шапка с логотипом и иконкой админа */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    margin-bottom: 5px;
-    gap: 10px;
+    gap: var(--container-gap);
 }
 
 /* Название */
 .logo {
-    font-size: 48px;
+    font-size: var(--logo-font-size);
     font-weight: 900;
     text-align: center;
-    color: #ffcc00;
-    margin: 0;
-    letter-spacing: 1px;
+    color: var(--logo-color);
+    margin-bottom: var(--logo-margin-bottom);
+    letter-spacing: 2px;
     font-family: 'Press Start 2P', 'Courier New', monospace;
     text-shadow: 
-        4px 4px 0 #1a5bbf,
-        2px 2px 0 #0d3c6e,
-        0 0 8px rgba(0,0,0,0.25);
+        5px 5px 0 var(--logo-shadow),
+        3px 3px 0 #0d3c6e,
+        0 0 10px rgba(0,0,0,0.25);
     transform: scaleY(0.98);
-    display: inline-block;
-    width: auto;
-}
-
-/* Иконка админа (шестерёнка) */
-.admin-icon {
-    position: static;
-    transform: none;
-    flex-shrink: 0;
-    background: #1a73e8;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    font-size: 18px;
-    transition: all 0.2s;
-}
-
-.admin-icon:hover {
-    background: #1557b0;
-    transform: scale(1.05);
+    image-rendering: crisp-edges;
 }
 
 /* Слоган */
 .subtitle {
     text-align: center;
-    color: #5f6368;
-    font-size: 14px;
-    margin: 5px 0 15px 0;
+    color: var(--text-light);
+    font-size: var(--subtitle-font-size);
+    margin-bottom: var(--subtitle-margin-bottom);
 }
 
-/* Контейнер для 4 кнопок — две в ряд */
+/* 4 кнопки-примера */
 .sample-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sample-buttons-gap);
+    justify-content: center;
+    margin-bottom: var(--sample-buttons-margin-bottom);
 }
 
-/* Стиль кнопки — прибитая гвоздиками */
 .sample-btn {
-    background: #f5f3f0;
-    border: 2px solid #8b7a6b;
-    border-radius: 12px;
-    padding: 14px 8px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #2c3e2f;
+    background: var(--bg-button);
+    border: none;
+    border-radius: 24px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--primary-color);
     cursor: pointer;
     transition: all 0.2s;
-    text-align: center;
-    box-shadow: 
-        inset 0 1px 0 rgba(255,255,255,0.6),
-        0 4px 6px rgba(0,0,0,0.1),
-        0 0 0 2px #d4c5b0,
-        0 0 0 5px #8b7a6b;
-    margin: 6px 0;
 }
 
 .sample-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-        inset 0 1px 0 rgba(255,255,255,0.6),
-        0 6px 10px rgba(0,0,0,0.15),
-        0 0 0 2px #d4c5b0,
-        0 0 0 5px #6b5b4e;
+    background: #e8eaed;
+    transform: scale(1.02);
 }
 
 /* Окно для вопроса */
 .search-box {
     width: 100%;
-    margin-bottom: 12px;
 }
 
 #questionInput {
     width: 100%;
-    padding: 14px 18px;
-    font-size: 16px;
-    border: 2px solid #dadce0;
+    padding: var(--input-padding);
+    font-size: var(--input-font-size);
+    border: 1px solid #dfe1e5;
     border-radius: 28px;
     outline: none;
+    transition: all 0.2s;
     font-family: inherit;
 }
 
 #questionInput:focus {
-    border-color: #1a73e8;
+    border-color: var(--primary-color);
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
 /* Кнопка Спросить */
 .ask-button {
     width: 100%;
-    padding: 14px 20px;
-    font-size: 16px;
-    background: #1a73e8;
+    padding: var(--ask-button-padding);
+    font-size: var(--ask-button-font-size);
+    background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 28px;
     cursor: pointer;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-weight: 500;
     transition: background 0.2s;
 }
 
 .ask-button:hover {
-    background: #1557b0;
+    background: var(--primary-hover);
 }
 
-/* Окно для ответа — растянуто до низа */
+/* Окно для ответа */
 .answer-container {
-    background: #f8f9fa;
+    background: var(--bg-gray);
     border-radius: 16px;
-    padding: 18px;
-    font-size: 16px;
+    padding: var(--answer-padding);
+    font-size: var(--answer-font-size);
     line-height: 1.5;
-    color: #202124;
+    color: var(--text-dark);
     border: 1px solid #e8eaed;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
+    min-height: var(--answer-min-height);
+    margin-top: var(--answer-margin-top);
 }
 
-/* Стили для кликабельных имён */
+/* Стили для кликабельных имён и предложений */
 .mention, .suggestion {
-    color: #1a73e8;
+    color: var(--primary-color);
     text-decoration: underline;
     cursor: pointer;
     font-weight: 500;
 }
 
 .mention:hover, .suggestion:hover {
-    color: #1557b0;
+    color: var(--primary-hover);
 }
 
-/* Кнопка "Подробнее" */
-.more-button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 24px;
-    cursor: pointer;
-    font-size: 14px;
-    width: 100%;
-}
-
-.more-button:hover {
-    background: #1557b0;
-}
-
-/* === АДМИНКА === */
-
-/* Модальное окно входа */
-.admin-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.admin-modal-content {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    max-width: 300px;
-    text-align: center;
-}
-
-.admin-modal-content h3 {
-    margin-bottom: 20px;
-    color: #1a73e8;
-}
-
-.admin-modal-content input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-.admin-modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.admin-modal-buttons button {
-    background: #1a73e8;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 24px;
-    cursor: pointer;
-}
-
-.admin-modal-buttons button:last-child {
-    background: #ccc;
-    color: black;
-}
-
-/* Панель админа */
-.admin-panel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    min-width: 280px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    z-index: 1100;
-    text-align: center;
-}
-
-.admin-panel h3 {
-    margin-bottom: 20px;
-    color: #1a73e8;
-}
-
-.admin-panel button {
-    background: #1a73e8;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 24px;
-    cursor: pointer;
-    margin: 5px;
-    width: 90%;
-}
-
-.admin-panel button:last-child {
-    background: #ccc;
-    color: black;
-}
-
-/* Анимация загрузки */
-.loading-container {
-    text-align: center;
-    padding: 20px;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 15px;
-    border: 4px solid #e0e0e0;
-    border-top: 4px solid #1a73e8;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-    color: #5f6368;
-    font-size: 16px;
-    margin-bottom: 10px;
-}
-
-.loading-timer {
-    color: #1a73e8;
-    font-size: 24px;
-    font-weight: bold;
-    font-family: monospace;
-    margin-top: 10px;
-}
-
-/* Адаптив для телефонов */
-@media (max-width: 500px) {
-    .logo { font-size: 32px; }
-    .admin-icon { width: 30px; height: 30px; font-size: 14px; }
-    .sample-btn { font-size: 12px; padding: 8px 6px; }
-    .sample-buttons { gap: 8px; }
-    #questionInput { padding: 12px 16px; font-size: 14px; }
-    .ask-button { padding: 10px 16px; font-size: 14px; }
-    .answer-container { padding: 12px; font-size: 14px; }
-    .admin-modal-content { padding: 20px; max-width: 260px; }
-    .admin-panel { padding: 20px; min-width: 240px; }
-    .logo { font-size: 28px; letter-spacing: 0px; }
+/* Адаптив под мобильные устройства */
+@media (max-width: 600px) {
+    :root {
+        --logo-font-size: 36px;
+        --input-padding: 14px 18px;
+        --ask-button-padding: 12px 18px;
+        --answer-padding: 18px;
+    }
+    .sample-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }

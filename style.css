@@ -6,6 +6,9 @@
 
 /* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ === */
 :root {
+    /* Общий сдвиг всей страницы вниз (для выреза камеры/notch) */
+    --top-offset: 45px;
+    
     /* Отступы */
     --body-padding: 10px;
     --container-padding-top: 10px;
@@ -55,7 +58,7 @@ body {
     background: #ffffff;
     color: var(--text-dark);
     min-height: 100vh;
-    padding: var(--body-padding);
+    padding: var(--top-offset) var(--body-padding) var(--body-padding) var(--body-padding);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -192,6 +195,7 @@ body {
         --input-padding: 14px 18px;
         --ask-button-padding: 12px 18px;
         --answer-padding: 18px;
+        --top-offset: 30px;
     }
     .sample-btn {
         font-size: 12px;

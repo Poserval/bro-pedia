@@ -6,12 +6,9 @@
 
 /* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ === */
 :root {
-    /* Общий отступ сверху (под камеру) — меняй это значение */
-    --top-offset: 60px;
-    
     /* Отступы */
-    --body-padding-sides: 10px;
-    --body-padding-bottom: 10px;
+    --body-padding: 10px;
+    --container-padding-top: 10px;
     --container-padding-sides: 20px;
     --container-padding-bottom: 20px;
     --container-gap: 20px;
@@ -42,9 +39,6 @@
     --answer-min-height: 120px;
     --answer-margin-top: 10px;
     
-    /* Безопасная зона для выреза (notch) */
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    
     /* Цвета */
     --primary-color: #1a73e8;
     --primary-hover: #1557b0;
@@ -61,7 +55,7 @@ body {
     background: #ffffff;
     color: var(--text-dark);
     min-height: 100vh;
-    padding: calc(var(--top-offset) + var(--safe-area-top)) var(--body-padding-sides) var(--body-padding-bottom);
+    padding: var(--body-padding);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,7 +65,7 @@ body {
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
-    padding: 0 var(--container-padding-sides) var(--container-padding-bottom);
+    padding: var(--container-padding-top) var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;
     gap: var(--container-gap);

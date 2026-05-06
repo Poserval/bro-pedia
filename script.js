@@ -9,22 +9,67 @@ let currentTitle = '';
 let loadingInterval = null;
 let startTime = null;
 
+// === УМНЫЕ КНОПКИ: ИСТОРИЯ ПОСЛЕДНИХ УНИКАЛЬНЫХ ЗАПРОСОВ ===
+const DEFAULT_QUESTIONS = [
+    "Ип Ман",
+    "Чебурашка",
+    "DeepSeek",
+    "Успенский"
+];
+
+function getQuestionsHistory() {
+    const stored = localStorage.getItem("questionsHistory");
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch(e) { console.log("Parse error", e); }
+    }
+    return [...DEFAULT_QUESTIONS];
+}
+
+function saveQuestionsHistory(history) {
+    localStorage.setItem("questionsHistory", JSON.stringify(history.slice(0, 4)));
+}
+
+function updateButtons(history) {
+    const btns = document.querySelectorAll('.sample-btn');
+    for (let i = 0; i < btns.length && i < history.length; i++) {
+        btns[i].textContent = history[i];
+    }
+}
+
+function addQuestionToHistory(question) {
+    if (!question || question.trim() === "") return;
+    let history = getQuestionsHistory();
+    // Удаляем этот вопрос, если он уже был в списке
+    history = history.filter(q => q !== question);
+    // Добавляем в конец (как самый свежий)
+    history.push(question);
+    // Оставляем только 4 последних
+    if (history.length > 4) history = history.slice(-4);
+    saveQuestionsHistory(history);
+    updateButtons(history);
+}
+
+// Инициализация кнопок при загрузке
+function initButtons() {
+    const history = getQuestionsHistory();
+    updateButtons(history);
+}
+
 // === АДМИН-ПАНЕЛЬ ===
 const ADMIN_PASSWORD = 'bropedia2025';
 
-// Проверяем, открыто ли приложение в WebView (APK)
 function isWebView() {
     const userAgent = navigator.userAgent.toLowerCase();
     return userAgent.includes('wv') || userAgent.includes('android webview');
 }
 
-// Показываем иконку админки ТОЛЬКО в браузере (не в APK)
 if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
     const adminIcon = document.getElementById('adminIcon');
     if (adminIcon) adminIcon.style.display = 'flex';
 }
 
-// Функция проверки баланса
 async function checkBalance() {
     try {
         const response = await fetch(`${BACKEND_URL}/admin/balance/${ADMIN_PASSWORD}`);
@@ -39,7 +84,6 @@ async function checkBalance() {
     }
 }
 
-// Функция проверки кэша
 async function checkCache() {
     try {
         const response = await fetch(`${BACKEND_URL}/admin/cache/${ADMIN_PASSWORD}`);
@@ -50,7 +94,6 @@ async function checkCache() {
     }
 }
 
-// Функция входа в админку
 async function checkAdminPassword(password) {
     if (password === ADMIN_PASSWORD) {
         localStorage.setItem('admin_logged_in', 'true');
@@ -128,10 +171,10 @@ questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') askQuestion();
 });
 
-// Обработка кнопок-примеров
+// Обработка нажатий на динамические кнопки
 document.querySelectorAll('.sample-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        const question = btn.getAttribute('data-question');
+        const question = btn.textContent;
         if (question) {
             questionInput.value = question;
             askQuestion();
@@ -179,6 +222,9 @@ function hideLoading() {
 async function askQuestion() {
     const question = questionInput.value.trim();
     if (!question) return;
+    
+    // Добавляем вопрос в историю кнопок
+    addQuestionToHistory(question);
     
     currentQuestion = question;
     showLoading();
@@ -275,3 +321,6 @@ function displayAnswer(answerHtml, showFullButton) {
         answerContainer.appendChild(button);
     }
 }
+
+// Инициализируем кнопки при загрузке страницы
+initButtons();

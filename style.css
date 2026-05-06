@@ -54,16 +54,17 @@ body {
 }
 
 .logo {
-    font-size: var(--logo-font-size);
+    font-size: clamp(32px, 8vw, 52px);
     font-weight: 900;
     text-align: center;
     color: var(--logo-color);
     margin-bottom: var(--logo-margin-bottom);
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     font-family: 'Press Start 2P', 'Courier New', monospace;
     text-shadow: 5px 5px 0 var(--logo-shadow), 3px 3px 0 #0d3c6e, 0 0 10px rgba(0,0,0,0.25);
     transform: scaleY(0.98);
     image-rendering: crisp-edges;
+    white-space: nowrap;
 }
 
 .subtitle {

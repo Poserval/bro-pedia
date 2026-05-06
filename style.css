@@ -6,7 +6,7 @@
 
 :root {
     /* === ОСНОВНЫЕ ОТСТУПЫ === */
-    --top-offset: 20px;           /* отступ от верха экрана (под камеру) */
+    --top-offset: 20px;
     --container-padding-sides: 20px;
     --container-gap: 16px;
     
@@ -206,20 +206,12 @@ body {
     color: var(--primary-hover);
 }
 
-/* Админка скрыта */
-#adminIcon,
-#adminModal,
-#adminPanel,
-.admin-panel,
-.admin-icon {
+/* Скрытие админки только в WebView (APK) */
+.webview #adminIcon,
+.webview #adminModal,
+.webview #adminPanel {
     display: none !important;
     visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
 }
 
 @media (max-width: 600px) {

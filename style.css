@@ -8,10 +8,10 @@
 :root {
     /* Отступы */
     --body-padding: 10px;
-    --container-padding-top: 10px;
+    --container-padding-top: 5px;
     --container-padding-sides: 20px;
     --container-padding-bottom: 20px;
-    --container-gap: 20px;
+    --container-gap: 15px;
     
     /* Название (логотип) */
     --logo-margin-bottom: 0px;

@@ -4,12 +4,58 @@
     box-sizing: border-box;
 }
 
+/* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ === */
+:root {
+    /* Отступы */
+    --body-padding: 10px;
+    --container-padding-top: 10px;
+    --container-padding-sides: 20px;
+    --container-padding-bottom: 20px;
+    --container-gap: 20px;
+    
+    /* Название (логотип) */
+    --logo-margin-bottom: 0px;
+    --logo-font-size: 52px;
+    
+    /* Слоган */
+    --subtitle-margin-bottom: 0px;
+    --subtitle-font-size: 16px;
+    
+    /* Кнопки-примеры */
+    --sample-buttons-gap: 10px;
+    --sample-buttons-margin-bottom: 10px;
+    
+    /* Поле ввода */
+    --input-padding: 16px 20px;
+    --input-font-size: 16px;
+    
+    /* Кнопка "Спросить" */
+    --ask-button-padding: 14px 20px;
+    --ask-button-font-size: 16px;
+    
+    /* Окно ответа */
+    --answer-padding: 24px;
+    --answer-font-size: 16px;
+    --answer-min-height: 120px;
+    --answer-margin-top: 10px;
+    
+    /* Цвета */
+    --primary-color: #1a73e8;
+    --primary-hover: #1557b0;
+    --text-dark: #202124;
+    --text-light: #5f6368;
+    --bg-gray: #f8f9fa;
+    --bg-button: #f1f3f4;
+    --logo-color: #ffcc00;
+    --logo-shadow: #1a5bbf;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     background: #ffffff;
-    color: #202124;
+    color: var(--text-dark);
     min-height: 100vh;
-    padding: 10px;
+    padding: var(--body-padding);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,23 +65,23 @@ body {
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
-    padding: 10px 20px 20px 20px;
+    padding: var(--container-padding-top) var(--container-padding-sides) var(--container-padding-bottom);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--container-gap);
 }
 
 /* Название */
 .logo {
-    font-size: 52px;
+    font-size: var(--logo-font-size);
     font-weight: 900;
     text-align: center;
-    color: #ffcc00;
-    margin-bottom: 0px;
+    color: var(--logo-color);
+    margin-bottom: var(--logo-margin-bottom);
     letter-spacing: 2px;
     font-family: 'Press Start 2P', 'Courier New', monospace;
     text-shadow: 
-        5px 5px 0 #1a5bbf,
+        5px 5px 0 var(--logo-shadow),
         3px 3px 0 #0d3c6e,
         0 0 10px rgba(0,0,0,0.25);
     transform: scaleY(0.98);
@@ -45,27 +91,27 @@ body {
 /* Слоган */
 .subtitle {
     text-align: center;
-    color: #5f6368;
-    font-size: 16px;
-    margin-bottom: 0;
+    color: var(--text-light);
+    font-size: var(--subtitle-font-size);
+    margin-bottom: var(--subtitle-margin-bottom);
 }
 
 /* 4 кнопки-примера */
 .sample-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--sample-buttons-gap);
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: var(--sample-buttons-margin-bottom);
 }
 
 .sample-btn {
-    background: #f1f3f4;
+    background: var(--bg-button);
     border: none;
     border-radius: 24px;
     padding: 8px 16px;
     font-size: 14px;
-    color: #1a73e8;
+    color: var(--primary-color);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -82,8 +128,8 @@ body {
 
 #questionInput {
     width: 100%;
-    padding: 16px 20px;
-    font-size: 16px;
+    padding: var(--input-padding);
+    font-size: var(--input-font-size);
     border: 1px solid #dfe1e5;
     border-radius: 28px;
     outline: none;
@@ -92,16 +138,16 @@ body {
 }
 
 #questionInput:focus {
-    border-color: #1a73e8;
+    border-color: var(--primary-color);
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
 /* Кнопка Спросить */
 .ask-button {
     width: 100%;
-    padding: 14px 20px;
-    font-size: 16px;
-    background: #1a73e8;
+    padding: var(--ask-button-padding);
+    font-size: var(--ask-button-font-size);
+    background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 28px;
@@ -111,39 +157,44 @@ body {
 }
 
 .ask-button:hover {
-    background: #1557b0;
+    background: var(--primary-hover);
 }
 
 /* Окно для ответа */
 .answer-container {
-    background: #f8f9fa;
+    background: var(--bg-gray);
     border-radius: 16px;
-    padding: 24px;
-    font-size: 16px;
+    padding: var(--answer-padding);
+    font-size: var(--answer-font-size);
     line-height: 1.5;
-    color: #202124;
+    color: var(--text-dark);
     border: 1px solid #e8eaed;
-    min-height: 120px;
-    margin-top: 10px;
+    min-height: var(--answer-min-height);
+    margin-top: var(--answer-margin-top);
 }
 
 /* Стили для кликабельных имён и предложений */
 .mention, .suggestion {
-    color: #1a73e8;
+    color: var(--primary-color);
     text-decoration: underline;
     cursor: pointer;
     font-weight: 500;
 }
 
 .mention:hover, .suggestion:hover {
-    color: #1557b0;
+    color: var(--primary-hover);
 }
 
-/* Адаптив */
+/* Адаптив под мобильные устройства */
 @media (max-width: 600px) {
-    .logo { font-size: 36px; }
-    .sample-btn { font-size: 12px; padding: 6px 12px; }
-    #questionInput { padding: 14px 18px; }
-    .ask-button { padding: 12px 18px; }
-    .answer-container { padding: 18px; }
+    :root {
+        --logo-font-size: 36px;
+        --input-padding: 14px 18px;
+        --ask-button-padding: 12px 18px;
+        --answer-padding: 18px;
+    }
+    .sample-btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }

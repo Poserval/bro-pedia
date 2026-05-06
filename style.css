@@ -206,6 +206,22 @@ body {
     color: var(--primary-hover);
 }
 
+/* Админка скрыта */
+#adminIcon,
+#adminModal,
+#adminPanel,
+.admin-panel,
+.admin-icon {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
 @media (max-width: 600px) {
     :root {
         --logo-font-size: 36px;

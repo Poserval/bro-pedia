@@ -9,6 +9,17 @@ let currentTitle = '';
 let loadingInterval = null;
 let startTime = null;
 
+// === ОПРЕДЕЛЕНИЕ WEBVIEW (APK) И СКРЫТИЕ АДМИНКИ ===
+function isWebView() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes('wv') || userAgent.includes('android webview');
+}
+
+// Если это WebView (APK), вешаем класс на body для скрытия админки через CSS
+if (isWebView()) {
+    document.body.classList.add('webview');
+}
+
 // === УМНЫЕ КНОПКИ: ИСТОРИЯ ПОСЛЕДНИХ УНИКАЛЬНЫХ ЗАПРОСОВ ===
 const DEFAULT_QUESTIONS = [
     "Ип Ман",
@@ -60,11 +71,7 @@ function initButtons() {
 // === АДМИН-ПАНЕЛЬ ===
 const ADMIN_PASSWORD = 'bropedia2025';
 
-function isWebView() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    return userAgent.includes('wv') || userAgent.includes('android webview');
-}
-
+// Показываем иконку админки только в браузере (не в APK)
 if (!isWebView() && localStorage.getItem('admin_logged_in') === 'true') {
     const adminIcon = document.getElementById('adminIcon');
     if (adminIcon) adminIcon.style.display = 'flex';

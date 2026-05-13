@@ -60,6 +60,11 @@ async function getCacheStats() {
     };
 }
 
+// Эндпоинт для Cron Job, чтобы сервер не засыпал
+app.get('/keep-alive', (req, res) => {
+    res.status(200).send('I am awake!');
+});
+
 // === ОБРАБОТКА РАСПЛЫВЧАТЫХ ЧИСЕЛ ===
 function replaceVagueNumbers(text) {
     const rules = [
@@ -331,4 +336,3 @@ app.use(express.static('.'));
 app.listen(PORT, () => {
     console.log(`🔥 Bro-педия на порту ${PORT}`);
 });
- 

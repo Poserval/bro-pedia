@@ -2,7 +2,7 @@ const questionInput = document.getElementById('questionInput');
 const askButton = document.getElementById('askButton');
 const answerContainer = document.getElementById('answerContainer');
 
-const BACKEND_URL = 'https://bro-pedia.onrender.com';
+const BACKEND_URL = 'http://194.226.163.73';
 
 let currentQuestion = '';
 let currentTitle = '';
